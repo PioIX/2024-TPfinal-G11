@@ -10,44 +10,61 @@ export default function Home() {
   const [title, setTitle] = useState('');
   const router = useRouter();
 
-  // Obtener pins al cargar el componente
+ 
+  const userID = localStorage.getItem('userID');
+
+
   useEffect(() => {
-    async function fetchPins() {
+    if (!userID) {
+      router.push('/login');
+    } else {
+      console.log(`UserID: ${userID}`);
+      fetchPins();
+    }
+  }, [userID]);
+
+
+  const fetchPins = async () => {
+    try {
       const res = await fetch('http://localhost:4000/pins');
+      if (!res.ok) throw new Error('Error al cargar pins');
       const data = await res.json();
       setPins(data);
+    } catch (error) {
+      console.error('Error al cargar pins:', error);
     }
-    fetchPins();
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.push('inicio/login');
   };
 
+
+  const handleLogout = () => {
+    localStorage.removeItem('userID'); // Eliminar solo el userID
+    router.push('/login');
+  };
+
+  // Subir imagen como Base64
   const handleImageUpload = async (e) => {
     e.preventDefault();
     const reader = new FileReader();
-  
+
     reader.onloadend = async () => {
       const base64Image = reader.result;
-  
+
       const newPin = {
         title,
-        image_base64: base64Image, // Enviamos la imagen como Base64
+        image_base64: base64Image,
       };
-  
+
       try {
         const res = await fetch('http://localhost:4000/pins', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newPin),
         });
-  
+
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         const createdPin = await res.json();
         setPins((prevPins) => [...prevPins, createdPin]);
-  
+
         setTitle('');
         setImage(null);
       } catch (error) {
@@ -55,16 +72,17 @@ export default function Home() {
         alert('No se pudo subir la imagen.');
       }
     };
-  
+
     reader.readAsDataURL(image); // Convierte la imagen a Base64
   };
-  
-  
+
   return (
     <div className={styles.container}>
-      {/* Barra de acciones */}
+      {}
       <div className={styles.actions}>
-        <button className={styles.button} onClick={handleLogout}>Cerrar Sesión</button>
+        <button className={styles.button} onClick={handleLogout}>
+          Cerrar Sesión
+        </button>
         <button className={styles.button}>Tableros</button>
         <form onSubmit={handleImageUpload} className={styles.uploadForm}>
           <input
@@ -79,20 +97,22 @@ export default function Home() {
             onChange={(e) => setImage(e.target.files[0])}
             required
           />
-          <button type="submit" className={styles.button}>Subir Imagen</button>
+          <button type="submit" className={styles.button}>
+            Subir Imagen
+          </button>
         </form>
       </div>
 
-      {/* Listado de pins */}
+      {}
       <div className={styles.pinContainer}>
-  {pins.map((pin) => (
-    <div key={pin.id} className={styles.pin}>
-      <img src={pin.image_url} alt={pin.title} className={styles.image} />
-      <h3 className={styles.pinTitle}>{pin.title}</h3>
-      <p>{pin.likes} Likes</p>
-    </div>
-  ))}
-</div>
+        {pins.map((pin) => (
+          <div key={pin.id} className={styles.pin}>
+            <img src={pin.image_url} alt={pin.title} className={styles.image} />
+            <h3 className={styles.pinTitle}>{pin.title}</h3>
+            <p>{pin.likes} Likes</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

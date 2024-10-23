@@ -18,6 +18,14 @@ export default function Login() {
 
     const data = await res.json();
     console.log(data);
+    if (res.status == 401) {
+      console.log("Credenciales invalidas")
+    }
+    else{
+      localStorage.setItem('userID', data.id); //localStorage.getItem("userID")
+      location.href = '/home'
+    }
+
     /*
     if (res.ok) {
       localStorage.setItem('token', data.token);
@@ -29,17 +37,7 @@ export default function Login() {
 
   return (
     <>
-      {/*
-    <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h2 className={styles.title}>Iniciar Sesión</h2>
-        <input className={styles.input} name="email" type="email" placeholder="Email" onChange={handleChange} required />
-        <input className={styles.input} name="password" type="password" placeholder="Contraseña" onChange={handleChange} required />
-        <button className={styles.button} type="submit">Iniciar sesión</button>
-      </form>
-    </div>
-    */
-      }
+      {}
       <div className={styles.container}>
         <h2 className={styles.title}>Iniciar Sesión</h2>
         <input className={styles.input} name="email" type="email" placeholder="Email" onChange={handleChange} required />
