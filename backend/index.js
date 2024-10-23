@@ -18,10 +18,17 @@ const io = socketIO(server, {
     },
 });
 
+
+
+
+
+
 // Middleware básico
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+
+
 
 // Middleware de sesión
 const sessionMiddleware = session({
@@ -98,19 +105,33 @@ app.post('/login', async (req, res) => {
     res.json({ token });
 });
 
-app.post('/pins/:id/like', async (req, res) => {
-	const pinId = req.params.id;
+app.post('/pins', async (req, res) => {
+    const { title, image_base64 } = req.body;
   
-	try {
-	  await db.query('UPDATE pins SET likes = likes + 1 WHERE id = ?', [pinId]);
-	  res.status(200).json({ message: 'Like agregado' });
-	} catch (error) {
-	  console.error('Error al dar like:', error);
-	  res.status(500).json({ error: 'Error al dar like' });
-	}
+    if (!title || !image_base64) {
+      return res.status(400).json({ error: 'Título e imagen son requeridos' });
+    }
+  
+    try {
+      const result = await db.query(
+        'INSERT INTO pins (title, image_url, likes) VALUES (?, ?, ?)',
+        [title, image_base64, 0] // Almacena el Base64 en la columna image_url
+      );
+  
+      const newPin = {
+        id: result.insertId,
+        title,
+        image_url: image_base64,
+        likes: 0,
+      };
+  
+      res.status(201).json(newPin); // Devuelve el nuevo pin
+    } catch (error) {
+      console.error('Error al crear pin:', error);
+      res.status(500).json({ error: 'Error al crear pin' });
+    }
   });
   
-
 
 // Middleware de autenticación basado en token
 async function authenticate(req, res, next) {
