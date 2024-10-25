@@ -41,7 +41,6 @@ io.use((socket, next) => {
 // Rutas de autenticación
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-  const passwordHash = hashPassword(password);
 
   try {
     const [existingUser] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
@@ -51,11 +50,10 @@ app.post('/register', async (req, res) => {
 
     const result = await db.query(
       'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
-      [username, email, passwordHash]
+      [username, email, password] // Almacenamiento directo de la contraseña
     );
 
-    const userId = result.insertId;
-    res.status(201).json({ id: userId });
+    res.status(201).json({ id: result.insertId });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
     res.status(500).json({ error: 'Error al registrar usuario' });
@@ -64,16 +62,19 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const passwordHash = hashPassword(password);
 
   try {
-    const [users] = await db.query('SELECT id FROM users WHERE email = ? AND password_hash = ?', [email, passwordHash]);
+    const [users] = await db.query(
+      'SELECT id FROM users WHERE email = ? AND password_hash = ?',
+      [email, password] // Comparación directa de contraseña
+    );
+
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    req.session.userId = users[0].id; 
-    res.json({ id: users[0].id });
+    req.session.userId = users[0].id; // Guardar ID de usuario en la sesión
+    res.json({ id: users[0].id }); // Enviar ID del usuario al cliente
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).json({ error: 'Error al iniciar sesión' });
@@ -81,7 +82,9 @@ app.post('/login', async (req, res) => {
 });
 
 
+
 app.post('/pins', async (req, res) => {
+  console.log("[POST] /pins req.body=",req.body);
   const { title, image_base64 } = req.body;
 
   if (!title || !image_base64) {

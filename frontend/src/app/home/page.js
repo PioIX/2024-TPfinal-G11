@@ -5,24 +5,28 @@ import { useRouter } from 'next/navigation';
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const [userID, setUserID] = useState(null); 
   const [pins, setPins] = useState([]);
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState('');
   const router = useRouter();
 
- 
-  const userID = localStorage.getItem('userID');
-
-
   useEffect(() => {
-    if (!userID) {
-      router.push('/login');
-    } else {
-      console.log(`UserID: ${userID}`);
-      fetchPins();
-    }
-  }, [userID]);
+    fetchPins(); 
+  }, []); 
+  
 
+
+    useEffect(() => {
+      const storedUserID = localStorage.getItem('userID');
+      if (storedUserID) {
+        setUserID(storedUserID);
+        console.log(`UserID: ${storedUserID}`);
+        fetchPins();
+      } else {
+        alert('No se encontró un ID de usuario.'); 
+      }
+    }, []);
 
   const fetchPins = async () => {
     try {
@@ -38,7 +42,7 @@ export default function Home() {
 
   const handleLogout = () => {
     localStorage.removeItem('userID'); // Eliminar solo el userID
-    router.push('/login');
+    router.push('/inicio/login');
   };
 
   // Subir imagen como Base64

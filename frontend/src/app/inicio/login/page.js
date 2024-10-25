@@ -26,13 +26,7 @@ export default function Login() {
       location.href = '/home'
     }
 
-    /*
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-    } else {
-      alert(data.error || 'Error al iniciar sesión');
-    }
-    */
+ 
   }
 
   return (
