@@ -12,21 +12,15 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchPins(); 
-  }, []); 
-  
-
-
-    useEffect(() => {
-      const storedUserID = localStorage.getItem('userID');
-      if (storedUserID) {
-        setUserID(storedUserID);
-        console.log(`UserID: ${storedUserID}`);
-        fetchPins();
-      } else {
-        alert('No se encontró un ID de usuario.'); 
-      }
-    }, []);
+    const storedUserID = localStorage.getItem('userID');
+    if (storedUserID) {
+      setUserID(storedUserID);
+      console.log(`UserID: ${storedUserID}`);
+      fetchPins();
+    } else {
+      alert('No se encontró un ID de usuario.'); 
+    }
+  }, []);
 
   const fetchPins = async () => {
     try {
@@ -39,15 +33,18 @@ export default function Home() {
     }
   };
 
-
   const handleLogout = () => {
     localStorage.removeItem('userID'); // Eliminar solo el userID
     router.push('/inicio/login');
   };
 
   // Subir imagen como Base64
-  const handleImageUpload = async (e) => {
-    e.preventDefault();
+  const handleImageUpload = async () => {
+    if (!image || !title) {
+      alert('Por favor, selecciona una imagen y proporciona un título.');
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onloadend = async () => {
@@ -69,6 +66,7 @@ export default function Home() {
         const createdPin = await res.json();
         setPins((prevPins) => [...prevPins, createdPin]);
 
+        // Resetear el estado
         setTitle('');
         setImage(null);
       } catch (error) {
@@ -82,32 +80,31 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      {}
       <div className={styles.actions}>
         <button className={styles.button} onClick={handleLogout}>
           Cerrar Sesión
         </button>
         <button className={styles.button}>Tableros</button>
-        <form onSubmit={handleImageUpload} className={styles.uploadForm}>
-          <input
-            type="text"
-            placeholder="Título de la imagen"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <input
-            type="file"
-            onChange={(e) => setImage(e.target.files[0])}
-            required
-          />
-          <button type="submit" className={styles.button}>
-            Subir Imagen
-          </button>
-        </form>
+        <input
+          type="text"
+          placeholder="Título de la imagen"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <input
+          type="file"
+          onChange={(e) => setImage(e.target.files[0])}
+          required
+        />
+        <button 
+          className={styles.button} 
+          onClick={handleImageUpload}
+        >
+          Subir Imagen
+        </button>
       </div>
 
-      {}
       <div className={styles.pinContainer}>
         {pins.map((pin) => (
           <div key={pin.id} className={styles.pin}>
