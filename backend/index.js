@@ -32,6 +32,10 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 // Vincular sesiones a Socket.IO
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
@@ -86,7 +90,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/pins', async (req, res) => {
   console.log("[POST] /pins req.body=",req.body);
-  const { title, image_base64 } = req.body;
+  const { title, image_base64, userID } = req.body;
 
   if (!title || !image_base64) {
     return res.status(400).json({ error: 'Título e imagen son requeridos' });
@@ -94,15 +98,14 @@ app.post('/pins', async (req, res) => {
 
   try {
     const result = await db.query(
-      'INSERT INTO pins (title, image_url, likes) VALUES (?, ?, ?)',
-      [title, image_base64, 0]
+      'INSERT INTO pins (title, image_url, user_id) VALUES (?, ?, ?)',
+      [title, image_base64, userID]
     );
 
     const newPin = {
       id: result.insertId,
       title,
       image_url: image_base64,
-      likes: 0,
     };
 
     res.status(201).json(newPin);

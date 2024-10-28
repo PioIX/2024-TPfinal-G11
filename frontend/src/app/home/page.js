@@ -38,6 +38,9 @@ export default function Home() {
     router.push('/inicio/login');
   };
 
+
+
+  
   // Subir imagen como Base64
   const handleImageUpload = async () => {
     if (!image || !title) {
@@ -49,10 +52,12 @@ export default function Home() {
 
     reader.onloadend = async () => {
       const base64Image = reader.result;
+      const storedUserID = localStorage.getItem('userID');
 
       const newPin = {
         title,
         image_base64: base64Image,
+        userID: storedUserID
       };
 
       try {
@@ -110,8 +115,11 @@ export default function Home() {
           <div key={pin.id} className={styles.pin}>
             <img src={pin.image_url} alt={pin.title} className={styles.image} />
             <h3 className={styles.pinTitle}>{pin.title}</h3>
-            <p>{pin.likes} Likes</p>
+            <p>{pin.likes} Likes❤️</p>
+            <p>{pin.likes} guardar</p>
+            
           </div>
+      
         ))}
       </div>
     </div>

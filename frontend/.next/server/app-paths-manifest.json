@@ -1,3 +1,5 @@
 {
-  "/home/page": "app/home/page.js"
+  "/home/page": "app/home/page.js",
+  "/inicio/login/page": "app/inicio/login/page.js",
+  "/inicio/register/page": "app/inicio/register/page.js"
 }

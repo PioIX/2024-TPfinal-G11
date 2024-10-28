@@ -38,13 +38,13 @@
 }
 
 .input:focus {
-  border-color: #e60023;
+  border-color: #7f00e6;
 }
 
 .button {
   font-size: 18px;
   padding: 12px;
-  background-color: #e60023;
+  background-color: #7f00e6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -53,7 +53,7 @@
 }
 
 .button:hover {
-  background-color: #cc001f;
+  background-color: #7f00e6;
 }
 
 @media (max-width: 768px) {
@@ -79,7 +79,7 @@
 }
 
 .button {
-  background-color: #007bff;
+  background-color: #8400ff;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -89,7 +89,7 @@
 }
 
 .button:hover {
-  background-color: #0056b3;
+  background-color: #8400ff;
 }
 
 .pinContainer {
