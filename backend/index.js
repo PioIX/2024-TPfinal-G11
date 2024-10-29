@@ -116,6 +116,63 @@ app.post('/pins', async (req, res) => {
 });
 
 
+// Ruta para agregar un comentario
+app.post('/comments', async (req, res) => {
+  const { pin_id, user_id, content } = req.body;
+
+  if (!pin_id || !user_id || !content) {
+    return res.status(400).json({ error: 'Pin, usuario y contenido son requeridos.' });
+  }
+
+  try {
+    const result = await db.query(
+      'INSERT INTO comments (pin_id, user_id, content) VALUES (?, ?, ?)',
+      [pin_id, user_id, content]
+    );
+
+    const newComment = {
+      id: result.insertId,
+      pin_id,
+      user_id,
+      content,
+      created_at: new Date(),
+    };
+
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error('Error al agregar comentario:', error);
+    res.status(500).json({ error: 'Error al agregar comentario.' });
+  }
+});
+// Ruta para obtener los comentarios de un pin específico
+app.get('/pins/:pin_id/comments', async (req, res) => {
+  const { pin_id } = req.params;
+
+  try {
+    const [comments] = await db.query(
+      'SELECT * FROM comments WHERE pin_id = ? ORDER BY created_at DESC',
+      [pin_id]
+    );
+    res.json(comments);
+  } catch (error) {
+    console.error('Error al obtener comentarios:', error);
+    res.status(500).json({ error: 'Error al obtener comentarios.' });
+  }
+});
+
+
+
+app.get('/pins/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [pin] = await db.query('SELECT * FROM pins WHERE id = ?', [id]);
+    if (!pin.length) return res.status(404).json({ error: 'Pin no encontrado' });
+    res.json(pin[0]);
+  } catch (error) {
+    console.error('Error al obtener el pin:', error);
+    res.status(500).json({ error: 'Error al obtener el pin' });
+  }
+});
 
 
 // Socket.IO
