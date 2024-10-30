@@ -33,8 +33,7 @@
   }
   
   .pin {
-    background-color: white;
-    border-radius: 10px;
+    background-image: url('/public/images/background.jpg');
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
