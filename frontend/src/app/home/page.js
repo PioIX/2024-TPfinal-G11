@@ -15,7 +15,6 @@ export default function Home() {
     const storedUserID = localStorage.getItem('userID');
     if (storedUserID) {
       setUserID(storedUserID);
-      console.log(`UserID: ${storedUserID}`);
       fetchPins();
     } else {
       alert('No se encontró un ID de usuario.'); 
@@ -24,7 +23,10 @@ export default function Home() {
 
   const fetchPins = async () => {
     try {
-      const res = await fetch('http://localhost:4000/pins');
+      const res = await fetch('http://localhost:4000/pins', {
+        method: 'GET',
+        credentials: 'include' 
+      });
       if (!res.ok) throw new Error('Error al cargar pins');
       const data = await res.json();
       setPins(data);
@@ -34,14 +36,10 @@ export default function Home() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userID'); // Eliminar solo el userID
+    localStorage.removeItem('userID'); 
     router.push('/inicio/login');
   };
 
-
-
-  
-  // Subir imagen como Base64
   const handleImageUpload = async () => {
     if (!image || !title) {
       alert('Por favor, selecciona una imagen y proporciona un título.');
@@ -111,15 +109,14 @@ export default function Home() {
       </div>
 
       <div className={styles.pinContainer}>
-        {pins.map((pin) => (
-          <div key={pin.id} className={styles.pin}>
+        {pins.map((pin, key) => (
+          <div key={key} className={styles.pin}>
             <img src={pin.image_url} alt={pin.title} className={styles.image} />
             <h3 className={styles.pinTitle}>{pin.title}</h3>
             <p>{pin.likes} Likes❤️</p>
-            <p>{pin.likes} guardar</p>
-            
           </div>
-      
+
+        
         ))}
       </div>
     </div>

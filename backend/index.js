@@ -9,6 +9,7 @@ const db = require('./db/connection');
 const app = express();
 const server = http.createServer(app);
 const LISTEN_PORT = 4000;
+app.use(cors());
 
 const io = socketIO(server, {
   cors: {
@@ -18,11 +19,13 @@ const io = socketIO(server, {
   },
 });
 
-
 // Middleware
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true,
+}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors());
 
 // Configurar sesión
 const sessionMiddleware = session({
@@ -32,32 +35,23 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-
 // Vincular sesiones a Socket.IO
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
-
-
 // Rutas de autenticación
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-
   try {
     const [existingUser] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existingUser.length > 0) {
       return res.status(400).json({ error: 'El email ya está registrado' });
     }
-
     const result = await db.query(
       'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
-      [username, email, password] // Almacenamiento directo de la contraseña
+      [username, email, password]
     );
-
     res.status(201).json({ id: result.insertId });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
@@ -67,47 +61,54 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const [users] = await db.query(
       'SELECT id FROM users WHERE email = ? AND password_hash = ?',
-      [email, password] // Comparación directa de contraseña
+      [email, password]
     );
-
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
-
-    req.session.userId = users[0].id; // Guardar ID de usuario en la sesión
-    res.json({ id: users[0].id }); // Enviar ID del usuario al cliente
+    req.session.userId = users[0].id;
+    res.json({ id: users[0].id });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).json({ error: 'Error al iniciar sesión' });
   }
 });
 
+// Obtener todos los pins
+app.get('/pins', async (req, res) => {
+  try {
+    const [pins] = await db.query('SELECT * FROM pins');
+    res.json(pins);
+  } catch (error) {
+    console.error('Error al cargar pins:', error);
+    res.status(500).json({ error: 'Error al cargar pins' });
+  }
+});
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
+app.use(bodyParser.json({ limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
 
 
+// Crear un nuevo pin
 app.post('/pins', async (req, res) => {
-  console.log("[POST] /pins req.body=",req.body);
   const { title, image_base64, userID } = req.body;
-
   if (!title || !image_base64) {
     return res.status(400).json({ error: 'Título e imagen son requeridos' });
   }
-
   try {
     const result = await db.query(
       'INSERT INTO pins (title, image_url, user_id) VALUES (?, ?, ?)',
       [title, image_base64, userID]
     );
-
     const newPin = {
       id: result.insertId,
       title,
       image_url: image_base64,
     };
-
     res.status(201).json(newPin);
   } catch (error) {
     console.error('Error al crear pin:', error);
@@ -115,62 +116,18 @@ app.post('/pins', async (req, res) => {
   }
 });
 
-
-// Ruta para agregar un comentario
-app.post('/comments', async (req, res) => {
-  const { pin_id, user_id, content } = req.body;
-
-  if (!pin_id || !user_id || !content) {
-    return res.status(400).json({ error: 'Pin, usuario y contenido son requeridos.' });
-  }
-
-  try {
-    const result = await db.query(
-      'INSERT INTO comments (pin_id, user_id, content) VALUES (?, ?, ?)',
-      [pin_id, user_id, content]
-    );
-
-    const newComment = {
-      id: result.insertId,
-      pin_id,
-      user_id,
-      content,
-      created_at: new Date(),
-    };
-
-    res.status(201).json(newComment);
-  } catch (error) {
-    console.error('Error al agregar comentario:', error);
-    res.status(500).json({ error: 'Error al agregar comentario.' });
-  }
-});
-// Ruta para obtener los comentarios de un pin específico
-app.get('/pins/:pin_id/comments', async (req, res) => {
-  const { pin_id } = req.params;
-
-  try {
-    const [comments] = await db.query(
-      'SELECT * FROM comments WHERE pin_id = ? ORDER BY created_at DESC',
-      [pin_id]
-    );
-    res.json(comments);
-  } catch (error) {
-    console.error('Error al obtener comentarios:', error);
-    res.status(500).json({ error: 'Error al obtener comentarios.' });
-  }
-});
-
-
-
+// Obtener un pin específico por ID
 app.get('/pins/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const [pin] = await db.query('SELECT * FROM pins WHERE id = ?', [id]);
-    if (!pin.length) return res.status(404).json({ error: 'Pin no encontrado' });
-    res.json(pin[0]);
+    if (pin.length === 0) {
+      return res.status(404).json({ error: 'Pin no encontrado' });
+    }
+    res.json(pin[0]); // Devuelve el primer pin encontrado
   } catch (error) {
-    console.error('Error al obtener el pin:', error);
-    res.status(500).json({ error: 'Error al obtener el pin' });
+    console.error('Error al cargar el pin:', error);
+    res.status(500).json({ error: 'Error al cargar el pin' });
   }
 });
 
