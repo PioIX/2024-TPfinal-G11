@@ -9,6 +9,7 @@ const db = require('./db/connection');
 const app = express();
 const server = http.createServer(app);
 const LISTEN_PORT = 4000;
+app.use(cors());
 
 const io = socketIO(server, {
   cors: {
@@ -18,11 +19,13 @@ const io = socketIO(server, {
   },
 });
 
-
 // Middleware
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true,
+}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors());
 
 // Configurar sesión
 const sessionMiddleware = session({
@@ -37,23 +40,18 @@ io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
-
-
 // Rutas de autenticación
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-
   try {
     const [existingUser] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existingUser.length > 0) {
       return res.status(400).json({ error: 'El email ya está registrado' });
     }
-
     const result = await db.query(
       'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
-      [username, email, password] // Almacenamiento directo de la contraseña
+      [username, email, password]
     );
-
     res.status(201).json({ id: result.insertId });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
@@ -63,48 +61,54 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const [users] = await db.query(
       'SELECT id FROM users WHERE email = ? AND password_hash = ?',
-      [email, password] // Comparación directa de contraseña
+      [email, password]
     );
-
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
-
-    req.session.userId = users[0].id; // Guardar ID de usuario en la sesión
-    res.json({ id: users[0].id }); // Enviar ID del usuario al cliente
+    req.session.userId = users[0].id;
+    res.json({ id: users[0].id });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).json({ error: 'Error al iniciar sesión' });
   }
 });
 
+// Obtener todos los pins
+app.get('/pins', async (req, res) => {
+  try {
+    const [pins] = await db.query('SELECT * FROM pins');
+    res.json(pins);
+  } catch (error) {
+    console.error('Error al cargar pins:', error);
+    res.status(500).json({ error: 'Error al cargar pins' });
+  }
+});
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
+app.use(bodyParser.json({ limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
 
 
+// Crear un nuevo pin
 app.post('/pins', async (req, res) => {
-  console.log("[POST] /pins req.body=",req.body);
-  const { title, image_base64 } = req.body;
-
+  const { title, image_base64, userID } = req.body;
   if (!title || !image_base64) {
     return res.status(400).json({ error: 'Título e imagen son requeridos' });
   }
-
   try {
     const result = await db.query(
-      'INSERT INTO pins (title, image_url, likes) VALUES (?, ?, ?)',
-      [title, image_base64, 0]
+      'INSERT INTO pins (title, image_url, user_id) VALUES (?, ?, ?)',
+      [title, image_base64, userID]
     );
-
     const newPin = {
       id: result.insertId,
       title,
       image_url: image_base64,
-      likes: 0,
     };
-
     res.status(201).json(newPin);
   } catch (error) {
     console.error('Error al crear pin:', error);
@@ -112,7 +116,20 @@ app.post('/pins', async (req, res) => {
   }
 });
 
-
+// Obtener un pin específico por ID
+app.get('/pins/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [pin] = await db.query('SELECT * FROM pins WHERE id = ?', [id]);
+    if (pin.length === 0) {
+      return res.status(404).json({ error: 'Pin no encontrado' });
+    }
+    res.json(pin[0]); // Devuelve el primer pin encontrado
+  } catch (error) {
+    console.error('Error al cargar el pin:', error);
+    res.status(500).json({ error: 'Error al cargar el pin' });
+  }
+});
 
 
 // Socket.IO
