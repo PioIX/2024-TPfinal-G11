@@ -27,7 +27,9 @@ export default function Register() {
     }
     */
   }
-
+  function irALogin() {
+    location.href = "/inicio/login"
+  }
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Registrarse</h2>
@@ -55,9 +57,9 @@ export default function Register() {
         onChange={handleChange}
         required
       />
-      <button className={styles.button} onClick={handleSubmit} type="button">
-        Registrarse
+      <button className={styles.button} onClick={handleSubmit} type="button"> Registrarse
       </button>
+      <button className={styles.button} onClick={irALogin} type="button">Iniciar sesión</button>
     </div>
   );
 }
