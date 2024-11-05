@@ -26,18 +26,24 @@ export default function Login() {
       location.href = '/home'
     }
 
- 
+  }
+  function irARegister() {
+    location.href = "/inicio/register"
   }
 
   return (
     <>
       {}
-      <div className={styles.container}>
-        <h2 className={styles.title}>Te damos la bienvenida a ICONIC</h2>
-        <input className={styles.input} name="email" type="email" placeholder="Email" onChange={handleChange} required />
-        <input className={styles.input} name="password" type="password" placeholder="Contraseña" onChange={handleChange} required />
-        <button className={styles.button} onClick={handleSubmit} type="button">Iniciar sesión</button>
-      </div>
+      <body className={styles.body}>
+        <div className={styles.container}>
+          <h2 className={styles.title}>Te damos la bienvenida a ICONIC</h2>
+          <input className={styles.input} name="email" type="email" placeholder="Email" onChange={handleChange} required />
+          <input className={styles.input} name="password" type="password" placeholder="Contraseña" onChange={handleChange} required />
+          <button className={styles.button} onClick={handleSubmit} type="button">Iniciar sesión</button>
+          <button className={styles.button} onClick={irARegister} type="button">Registrate</button>
+        </div>
+
+      </body>
     </>
 
   );
