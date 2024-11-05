@@ -9,6 +9,7 @@ export default function Home() {
   const [pins, setPins] = useState([]);
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -41,8 +42,8 @@ export default function Home() {
   };
 
   const handleImageUpload = async () => {
-    if (!image || !title) {
-      alert('Por favor, selecciona una imagen y proporciona un título.');
+    if (!image || !title || !description) {
+      alert('Por favor, proporciona un título, una descripción y una imagen.');
       return;
     }
 
@@ -54,6 +55,7 @@ export default function Home() {
 
       const newPin = {
         title,
+        description, 
         image_base64: base64Image,
         userID: storedUserID
       };
@@ -69,8 +71,9 @@ export default function Home() {
         const createdPin = await res.json();
         setPins((prevPins) => [...prevPins, createdPin]);
 
-        // Resetear el estado
+  
         setTitle('');
+        setDescription(''); 
         setImage(null);
       } catch (error) {
         console.error('Error al subir imagen:', error);
@@ -81,6 +84,12 @@ export default function Home() {
     reader.readAsDataURL(image); // Convierte la imagen a Base64
   };
 
+  function handleClick(pin) {
+    console.log(pin.id);
+    const url = "/pin?ID=" + pin.id;
+    router.push(url);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.actions}>
@@ -88,6 +97,7 @@ export default function Home() {
           Cerrar Sesión
         </button>
         <button className={styles.button}>Tableros</button>
+        
         <input
           type="text"
           placeholder="Título de la imagen"
@@ -95,11 +105,21 @@ export default function Home() {
           onChange={(e) => setTitle(e.target.value)}
           required
         />
+        
+        <textarea
+          placeholder="Descripción del pin"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          className={styles.textarea}
+        ></textarea>
+        
         <input
           type="file"
           onChange={(e) => setImage(e.target.files[0])}
           required
         />
+        
         <button 
           className={styles.button} 
           onClick={handleImageUpload}
@@ -110,13 +130,16 @@ export default function Home() {
 
       <div className={styles.pinContainer}>
         {pins.map((pin, key) => (
-          <div key={key} className={styles.pin}>
+          <div 
+            key={key} 
+            className={styles.pin} 
+            onClick={() => handleClick(pin)}
+          >
             <img src={pin.image_url} alt={pin.title} className={styles.image} />
             <h3 className={styles.pinTitle}>{pin.title}</h3>
-            <p>{pin.likes} Likes❤️</p>
+            <p className={styles.pinDescription}>{pin.description}</p> 
+            <p className={styles.pinLikes}>{pin.likes} Likes❤️</p>
           </div>
-
-        
         ))}
       </div>
     </div>

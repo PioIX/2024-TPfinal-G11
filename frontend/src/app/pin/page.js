@@ -1,42 +1,65 @@
-"use client"
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import styles from '../../styles/Home.module.css'; // Asegúrate de ajustar la ruta según sea necesario
+"use client";
 
-const PinPage = () => {
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/compat/router';  
+import styles from "../styles/Pin.module.css";
+import { useSearchParams } from 'next/navigation';
+
+export default function Pin() {
   const router = useRouter();
-  const { id } = router.query; // Obtener el ID del pin desde la URL
+  const searchParams = useSearchParams()
+  const id = searchParams.get('ID');
+
   const [pin, setPin] = useState(null);
 
   useEffect(() => {
+    const storedUserID = localStorage.getItem('userID');
+    setUserID(storedUserID);
+    console.log(searchParams)
     if (id) {
-      fetchPin();
+      fetchPin(id);
     }
   }, [id]);
 
-  const fetchPin = async () => {
+  const fetchPin = async (pinId) => {
     try {
-      const res = await fetch(`http://localhost:4000/pins/${id}`, {
-        credentials: 'include'
-      });
+      const res = await fetch(`http://localhost:4000/pins/${pinId}`);
       if (!res.ok) throw new Error('Error al cargar el pin');
       const data = await res.json();
+      console.log(data);
       setPin(data);
+      setLikes(data.likes);
     } catch (error) {
       console.error('Error al cargar el pin:', error);
     }
   };
 
-  if (!pin) return <p>Cargando...</p>;
+  const handleLike = async () => {
+    try {
+      const res = await fetch(`http://localhost:4000/likes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin_id: id, user_id: userID })
+      });
+      if (!res.ok) throw new Error('Error al dar like');
+
+      const data = await res.json();
+      // Actualiza el contador de likes según la respuesta
+      setLikes((prevLikes) => (data.message === 'Like agregado' ? prevLikes + 1 : prevLikes - 1));
+    } catch (error) {
+      console.error('Error al dar like:', error);
+    }
+  };
+
+
+  if (!pin) return <div>Cargando...</div>;
 
   return (
-    <div className={styles.container}>
-      <h1>{pin.title}</h1>
-      <img src={pin.image_url} alt={pin.title} className={styles.image} />
-      <p>{pin.likes} Likes ❤️</p>
-      {}
+    <div className={styles.pinContainer}>
+    <img src={pin.image_url} alt={pin.title} className={styles.image} />
+    <h1 className={styles.pinTitle}>{pin.title}</h1>
+    <p className={styles.pinDescription}>{pin.description}</p>
+    <button onClick={handleLike} className={styles.button}>👍 Like</button>
     </div>
   );
-};
-
-export default PinPage;
+}
