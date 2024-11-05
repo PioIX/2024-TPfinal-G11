@@ -95,19 +95,20 @@ app.use(bodyParser.json({ limit: '10mb' })); // Cambia a 2mb o el tamaño que de
 
 // Crear un nuevo pin
 app.post('/pins', async (req, res) => {
-  const { title, image_base64, userID } = req.body;
-  if (!title || !image_base64) {
+  const { title, image_base64, userID, description } = req.body;
+  if (!title || !image_base64 || !description) {
     return res.status(400).json({ error: 'Título e imagen son requeridos' });
   }
   try {
     const result = await db.query(
-      'INSERT INTO pins (title, image_url, user_id) VALUES (?, ?, ?)',
-      [title, image_base64, userID]
+      'INSERT INTO pins (title, image_url, user_id, description) VALUES (?, ?, ?, ?)',
+      [title, image_base64, userID, description]
     );
     const newPin = {
       id: result.insertId,
       title,
       image_url: image_base64,
+      description,
     };
     res.status(201).json(newPin);
   } catch (error) {
@@ -149,4 +150,34 @@ io.on("connection", (socket) => {
 // Iniciar servidor
 server.listen(LISTEN_PORT, () => {
   console.log(`Servidor NodeJS corriendo en http://localhost:${LISTEN_PORT}/`);
+});
+
+
+// Ruta para registrar un "like"
+app.post('/likes', async (req, res) => {
+  const { pin_id, user_id } = req.body;
+
+  try {
+    // Verificar si ya existe un like de este usuario en este pin
+    const [existingLike] = await db.query(
+      'SELECT * FROM likes WHERE pin_id = ? AND user_id = ?',
+      [pin_id, user_id]
+    );
+
+    if (existingLike) {
+      // Si el usuario ya dio like, eliminar el like (like toggle)
+      await db.query('DELETE FROM likes WHERE pin_id = ? AND user_id = ?', [pin_id, user_id]);
+      return res.json({ message: 'Like eliminado' });
+    }
+
+    // Si no existe, agregar un nuevo like
+    await db.query('INSERT INTO likes (pin_id, user_id) VALUES (?, ?)', [
+      pin_id,
+      user_id,
+    ]);
+    res.json({ message: 'Like agregado' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al procesar el like' });
+  }
 });

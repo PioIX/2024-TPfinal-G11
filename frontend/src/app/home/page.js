@@ -84,6 +84,12 @@ export default function Home() {
     reader.readAsDataURL(image); // Convierte la imagen a Base64
   };
 
+  function handleClick(pin) {
+    console.log(pin.id);
+    const url = "/pin?ID=" + pin.id;
+    router.push(url);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.actions}>
@@ -127,12 +133,12 @@ export default function Home() {
           <div 
             key={key} 
             className={styles.pin} 
-            onClick={() => router.push(`/pin?ID${pin.Id}`)}
+            onClick={() => handleClick(pin)}
           >
             <img src={pin.image_url} alt={pin.title} className={styles.image} />
             <h3 className={styles.pinTitle}>{pin.title}</h3>
-            <p>{pin.description}</p> 
-            <p>{pin.likes} Likes❤️</p>
+            <p className={styles.pinDescription}>{pin.description}</p> 
+            <p className={styles.pinLikes}>{pin.likes} Likes❤️</p>
           </div>
         ))}
       </div>
