@@ -1,6 +1,6 @@
 # Iconic
 
-![Logo de Iconic](.png)
+![Logo de Iconic](https://mail.google.com/mail/u/0/popout?ver=1qfmka04prad0#attid%253Datt_192fceeaec1d7088_0.1_92d95f7d_6cbab75f_d4788b6a_0a187838_4a26e0e6%25252F3ffbc0f8-8b7c-4b82-8466-d2570e041ea9.jpeg)
 
 ## Concepto
 
