@@ -1,17 +1,13 @@
 /* Authentication.module.css */
-
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  
-  
-}
-
 .body {
   background-image: url('/images/background.jpg');
+  background-size: 93% auto;
+
+}
+
+.container {
+  background-image: url('/images/background.jpg');
+  background-size: 93% auto;
 
 }
 
@@ -73,7 +69,6 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: #f8f9fa;
   min-height: 100vh;
 }
 
