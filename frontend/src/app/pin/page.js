@@ -9,6 +9,7 @@ export default function Pin() {
   const router = useRouter();
   const searchParams = useSearchParams()
   const id = searchParams.get('ID');
+  const [userID, setUserID] = useState(null);
 
   const [pin, setPin] = useState(null);
 
