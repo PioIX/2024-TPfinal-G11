@@ -10,6 +10,8 @@ export default function Pin() {
   const searchParams = useSearchParams()
   const id = searchParams.get('ID');
   const [userID, setUserID] = useState(null);
+  const [likes, setLikes] = useState(0); 
+  
 
   const [pin, setPin] = useState(null);
 
@@ -45,7 +47,7 @@ export default function Pin() {
       if (!res.ok) throw new Error('Error al dar like');
 
       const data = await res.json();
-      // Actualiza el contador de likes según la respuesta
+      console.log(likes)
       setLikes((prevLikes) => (data.message === 'Like agregado' ? prevLikes + 1 : prevLikes - 1));
     } catch (error) {
       console.error('Error al dar like:', error);
@@ -59,7 +61,8 @@ export default function Pin() {
     <div className={styles.pinContainer}>
     <img src={pin.image_url} alt={pin.title} className={styles.image} />
     <h1 className={styles.pinTitle}>{pin.title}</h1>
-    <p className={styles.pinDescription}>{pin.description}</p>
+    <p className={styles.pinUser}>Subido por: {pin.username}</p>
+    <h2 className={styles.pinDescription}>{pin.description}</h2>
     <button onClick={handleLike} className={styles.button}>👍 Like</button>
     </div>
   );

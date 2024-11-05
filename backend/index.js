@@ -77,10 +77,16 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Obtener todos los pins
+
+
+
 app.get('/pins', async (req, res) => {
   try {
-    const [pins] = await db.query('SELECT * FROM pins');
+    const [pins] = await db.query(`
+      SELECT p.*, u.username 
+      FROM pins p
+      JOIN users u ON p.user_id = u.id
+    `);
     res.json(pins);
   } catch (error) {
     console.error('Error al cargar pins:', error);
@@ -88,12 +94,12 @@ app.get('/pins', async (req, res) => {
   }
 });
 
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
 app.use(bodyParser.json({ limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
 
 
-// Crear un nuevo pin
 app.post('/pins', async (req, res) => {
   const { title, image_base64, userID, description } = req.body;
   if (!title || !image_base64 || !description) {
@@ -101,7 +107,7 @@ app.post('/pins', async (req, res) => {
   }
   try {
     const result = await db.query(
-      'INSERT INTO pins (title, image_url, user_id, description) VALUES (?, ?, ?, ?)',
+      'INSERT INTO pins (title, image_url, user_id, description, likes) VALUES (?, ?, ?, ?, 0)',
       [title, image_base64, userID, description]
     );
     const newPin = {
@@ -109,6 +115,7 @@ app.post('/pins', async (req, res) => {
       title,
       image_url: image_base64,
       description,
+      likes: 0, 
     };
     res.status(201).json(newPin);
   } catch (error) {
@@ -116,6 +123,7 @@ app.post('/pins', async (req, res) => {
     res.status(500).json({ error: 'Error al crear pin' });
   }
 });
+
 
 // Obtener un pin específico por ID
 app.get('/pins/:id', async (req, res) => {
@@ -165,7 +173,7 @@ app.post('/likes', async (req, res) => {
     );
 
     if (existingLike) {
-      // Si el usuario ya dio like, eliminar el like (like toggle)
+      // Si el usuario ya dio like, eliminar el like 
       await db.query('DELETE FROM likes WHERE pin_id = ? AND user_id = ?', [pin_id, user_id]);
       return res.json({ message: 'Like eliminado' });
     }
@@ -181,3 +189,5 @@ app.post('/likes', async (req, res) => {
     res.status(500).json({ message: 'Error al procesar el like' });
   }
 });
+
+
