@@ -1,7 +1,6 @@
 # Iconic
 
-![Logo de Iconic](![3ffbc0f8-8b7c-4b82-8466-d2570e041ea9](https://github.com/user-attachments/assets/8bd65d90-40fd-4882-874f-1e0221e3d249)
-)
+![Logo de Iconic](https://github.com/user-attachments/assets/8bd65d90-40fd-4882-874f-1e0221e3d249)
 
 ## Concepto
 
