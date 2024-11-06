@@ -169,29 +169,100 @@ server.listen(LISTEN_PORT, () => {
 });
 
 
-// Ruta para registrar un "like"
-// Backend (Node.js con Express)
 
-// Ruta para agregar/quitar un like
+// Ruta para agregar o quitar un like
 app.post('/likes', async (req, res) => {
   const { pin_id, user_id } = req.body;
 
   try {
-    // Verificar si el usuario ya ha dado like al pin
-    const existingLike = await db.query('SELECT * FROM likes WHERE pin_id = ? AND user_id = ?', [pin_id, user_id]);
+    // Verificar si ya existe un like para este pin y usuario
+    const [existingLike] = await db.query(
+      'SELECT * FROM likes WHERE pin_id = ? AND user_id = ?',
+      [pin_id, user_id]
+    );
 
     if (existingLike.length > 0) {
-      // Si el like ya existe, no agregar uno nuevo
-      return res.status(400).json({ message: 'Ya has dado like a este pin' });
+      // Si ya existe el like, actualizarlo para alternar entre like y dislike
+      const newLikeStatus = existingLike[0].liked ? false : true; // Alterna entre true y false
+      await db.query(
+        'UPDATE likes SET liked = ? WHERE pin_id = ? AND user_id = ?',
+        [newLikeStatus, pin_id, user_id]
+      );
+      return res.json({ message: newLikeStatus ? 'Like agregado' : 'Like eliminado' });
     }
 
-    // Si el like no existe, agregar un like
-    await db.query('INSERT INTO likes (pin_id, user_id) VALUES (?, ?)', [pin_id, user_id]);
+    // Si no existe el like, crearlo con el valor 'true' (liked)
+    await db.query(
+      'INSERT INTO likes (pin_id, user_id, liked) VALUES (?, ?, ?)',
+      [pin_id, user_id, true]
+    );
     res.json({ message: 'Like agregado' });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al manejar el like' });
   }
+});
+
+
+app.delete('/likes', async (req, res) => {
+  const { pin_id, user_id } = req.body;
+
+  try {
+    // Verificar si el like existe
+    const [existingLike] = await db.query('SELECT * FROM likes WHERE pin_id = ? AND user_id = ?', [pin_id, user_id]);
+    
+    if (existingLike.length === 0) {
+      return res.status(400).json({ message: 'No has dado like a este pin' });
+    }
+
+    // Eliminar el like
+    await db.query('DELETE FROM likes WHERE pin_id = ? AND user_id = ?', [pin_id, user_id]);
+    res.json({ message: 'Like eliminado' });
+  } catch (error) {
+    console.error('Error al eliminar like:', error);
+    res.status(500).json({ message: 'Error al eliminar like' });
+  }
+});
+
+
+
+// Socket.IO para manejar el like de un pin
+io.on("connection", (socket) => {
+  console.log("Cliente conectado");
+
+  socket.on("like_pin", async (pinId, userId) => {
+    // Verificar si el like ya existe para este pin y usuario
+    const [existingLike] = await db.query(
+      'SELECT * FROM likes WHERE pin_id = ? AND user_id = ?',
+      [pinId, userId]
+    );
+
+    let likeStatus = false; // Default: no like
+
+    if (existingLike.length > 0) {
+      // Si existe, alternar entre true y false
+      likeStatus = !existingLike[0].liked;
+      await db.query(
+        'UPDATE likes SET liked = ? WHERE pin_id = ? AND user_id = ?',
+        [likeStatus, pinId, userId]
+      );
+    } else {
+      // Si no existe el like, crearlo
+      likeStatus = true;
+      await db.query(
+        'INSERT INTO likes (pin_id, user_id, liked) VALUES (?, ?, ?)',
+        [pinId, userId, likeStatus]
+      );
+    }
+
+    // Emitir evento para actualizar los likes en tiempo real
+    io.emit("update_likes", { pinId, likeStatus });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado");
+  });
 });
 
 

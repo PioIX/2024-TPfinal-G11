@@ -19,10 +19,8 @@
   margin-bottom: 20px;
 }
 
-.liked {
-  background-color: red; /* Rojo cuando se ha dado like */
-  color: white;
-}
+
+
 
 .image {
   width: 100%;
@@ -55,17 +53,19 @@
 }
 
 
-
 .button {
-  background-color: #ff4757;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 4px;
   margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: rgb(228, 205, 250); /* Fondo blanco cuando no tiene like */
+  color: #333; /* Texto en gris oscuro */
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.button:hover {
-  background-color: #e84118;
+.button.liked {
+  background-color: #A275BD; /* Fondo rojo cuando tiene like */
+  color: white; /* Texto en blanco cuando tiene like */
 }

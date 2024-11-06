@@ -11,7 +11,7 @@ export default function Pin() {
   const id = searchParams.get('ID');
   const [userID, setUserID] = useState(null);
   const [likes, setLikes] = useState(0);
-  const [hasLiked, setHasLiked] = useState(false); // Estado para verificar si el usuario ya dio like
+  const [hasLiked, setHasLiked] = useState(false); 
   const [pin, setPin] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -31,43 +31,71 @@ export default function Pin() {
       if (!res.ok) throw new Error('Error al cargar el pin');
       const data = await res.json();
       setPin(data);
-      setLikes(data.likes); // Actualizar el contador de likes
+      setLikes(data.likes); 
 
       // Comprobar si el usuario ya dio like a este pin
       const likeRes = await fetch(`http://localhost:4000/likes?pin_id=${pinId}&user_id=${userID}`);
       const likeData = await likeRes.json();
       if (likeData.exists) {
-        setHasLiked(true); // Si el usuario ya dio like, actualizar el estado
+        setHasLiked(true); 
       }
     } catch (error) {
       console.error('Error al cargar el pin:', error);
     }
   };
 
+ 
+
   const handleLike = async () => {
-    if (hasLiked) {
-      setErrorMessage("Ya has dado like a este pin.");
-      return;
-    }
-
     try {
-      const res = await fetch(`http://localhost:4000/likes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin_id: id, user_id: userID })
-      });
-
-      if (!res.ok) throw new Error(await res.text()); // Leer y lanzar el error
-
-      const data = await res.json();
-      setLikes((prevLikes) => prevLikes + 1); // Actualizar el contador de likes
-      setHasLiked(true); // Marcar que el usuario ha dado like
-      setErrorMessage(""); // Limpiar mensaje de error si el like fue exitoso
+      setHasLiked(true);
+      if (hasLiked) {
+        // Si el usuario ya le dio like, eliminamos el like
+        const res = await fetch(`http://localhost:4000/likes`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin_id: id, user_id: userID })
+        });
+  
+        if (!res.ok) throw new Error(await res.text()); 
+  
+        const data = await res.json();
+  
+        // Si el like se eliminó correctamente, actualizamos el estado
+        if (data.message === "Like eliminado") {
+          setLikes((prevLikes) => prevLikes - 1); // Reducir el contador de likes
+          setHasLiked(false); // Cambiar el estado a no tener like
+          setErrorMessage(""); // Limpiar mensaje de error
+        } else {
+          setErrorMessage("Hubo un problema al eliminar el like.");
+        }
+      } else {
+        // Si no le ha dado like, agregamos el like
+        const res = await fetch(`http://localhost:4000/likes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin_id: id, user_id: userID })
+        });
+  
+        if (!res.ok) throw new Error(await res.text()); 
+  
+        const data = await res.json();
+  
+        // Si el like se añadió con éxito, actualizamos el estado
+        if (data.message === "Like agregado") {
+          setLikes((prevLikes) => prevLikes + 1); // Incrementar el contador de likes
+          setHasLiked(true); // Cambiar el estado a tener like
+          setErrorMessage(""); // Limpiar mensaje de error
+        } else {
+          setErrorMessage("Hubo un problema al agregar el like.");
+        }
+      }
     } catch (error) {
-      console.error('Error al dar like:', error);
-      setErrorMessage("Hubo un problema al dar like.");
+      console.error('Error al manejar el like:', error);
+      setErrorMessage("Hubo un problema al manejar el like.");
     }
   };
+  
 
   if (!pin) return <div>Cargando...</div>;
 
@@ -80,15 +108,13 @@ export default function Pin() {
 
       <button
         onClick={handleLike}
-        className={`${styles.button} ${hasLiked ? styles.liked : ''}`} // Cambiar clase si ya dio like
+        className={`${styles.button} ${hasLiked ? styles.liked : ''}`} 
       >
-        {hasLiked ? "♥️ Ya te gusta" : "Like ❤️"} {/* Cambiar el texto según si ya le dio like */}
+        {hasLiked ? "Like ❤️" : "Like"} 
       </button>
 
     
       {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
-
-      <p className={styles.pinLikes}>{likes} </p> {/* Contador de likes */}
     </div>
   );
 }
