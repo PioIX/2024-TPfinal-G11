@@ -19,6 +19,10 @@
   margin-bottom: 20px;
 }
 
+.liked {
+  background-color: red; /* Rojo cuando se ha dado like */
+  color: white;
+}
 
 .image {
   width: 100%;

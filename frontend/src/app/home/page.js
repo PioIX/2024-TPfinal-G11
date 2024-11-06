@@ -12,6 +12,7 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const router = useRouter();
 
+
   useEffect(() => {
     const storedUserID = localStorage.getItem('userID');
     if (storedUserID) {
@@ -90,6 +91,14 @@ export default function Home() {
     router.push(url);
   }
 
+  const groupedPins = pins.reduce((acc, pin) => {
+    const { category } = pin;
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(pin);
+    return acc;
+  }, {});
+  
+
   return (
     <div className={styles.container}>
       <div className={styles.actions}>
@@ -113,7 +122,7 @@ export default function Home() {
           required
           className={styles.textarea}
         ></textarea>
-        
+      
         <input
           type="file"
           onChange={(e) => setImage(e.target.files[0])}
