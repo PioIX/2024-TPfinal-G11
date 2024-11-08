@@ -9,6 +9,7 @@ export default function Home() {
   const [pins, setPins] = useState([]);
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState('');
+  const [category, setCategory] = useState(""); 
   const [description, setDescription] = useState('');
   const router = useRouter();
 
@@ -43,47 +44,49 @@ export default function Home() {
   };
 
   const handleImageUpload = async () => {
-    if (!image || !title || !description) {
-      alert('Por favor, proporciona un título, una descripción y una imagen.');
+    if (!image || !title || !description || !category) {
+      alert('Por favor, proporciona un título, una descripción, una imagen y selecciona una categoría.');
       return;
     }
-
+  
     const reader = new FileReader();
-
+  
     reader.onloadend = async () => {
       const base64Image = reader.result;
       const storedUserID = localStorage.getItem('userID');
-
+  
       const newPin = {
         title,
-        description, 
+        description,
         image_base64: base64Image,
-        userID: storedUserID
+        userID: storedUserID,
+        category, 
       };
-
+  
       try {
         const res = await fetch('http://localhost:4000/pins', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newPin),
         });
-
+  
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         const createdPin = await res.json();
         setPins((prevPins) => [...prevPins, createdPin]);
-
   
         setTitle('');
-        setDescription(''); 
+        setDescription('');
         setImage(null);
+        setCategory(''); 
       } catch (error) {
         console.error('Error al subir imagen:', error);
         alert('No se pudo subir la imagen.');
       }
     };
-
-    reader.readAsDataURL(image); // Convierte la imagen a Base64
+  
+    reader.readAsDataURL(image); 
   };
+  
 
   function handleClick(pin) {
     console.log(pin.id);
@@ -99,7 +102,7 @@ export default function Home() {
   }, {});
   
 
-  return (
+return (
     <div className={styles.container}>
       <div className={styles.actions}>
         <button className={styles.button} onClick={handleLogout}>
@@ -123,12 +126,27 @@ export default function Home() {
           className={styles.textarea}
         ></textarea>
       
-        <input
-          type="file"
-          onChange={(e) => setImage(e.target.files[0])}
-          required
-        />
-        
+      <div className={styles.uploadFileButton}>
+  <label htmlFor="fileInput">Seleccionar archivo</label>
+  <input
+    type="file"
+    id="fileInput"
+    onChange={(e) => setImage(e.target.files[0])}
+    required
+  />
+</div>
+  
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className={styles.selectCategory} 
+        >
+          <option value="">Selecciona una categoría</option>
+          <option value="Arte">Arte</option>
+          <option value="Tecnología">Tecnología</option>
+          <option value="Diseño">Diseño</option>
+        </select>
+  
         <button 
           className={styles.button} 
           onClick={handleImageUpload}
@@ -136,7 +154,7 @@ export default function Home() {
           Subir Imagen
         </button>
       </div>
-
+  
       <div className={styles.pinContainer}>
         {pins.map((pin, key) => (
           <div 

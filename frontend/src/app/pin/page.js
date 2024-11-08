@@ -18,31 +18,34 @@ export default function Pin() {
   useEffect(() => {
     const storedUserID = localStorage.getItem('userID');
     setUserID(storedUserID);
-    console.log(searchParams);
 
-    if (id) {
-      fetchPin(id);
+    if (id && storedUserID) {
+      fetchPin(id, storedUserID);
     }
-  }, [id]);
+  }, [id, userID]);
 
   const fetchPin = async (pinId) => {
     try {
+      // Obtiene los datos del pin
       const res = await fetch(`http://localhost:4000/pins/${pinId}`);
       if (!res.ok) throw new Error('Error al cargar el pin');
       const data = await res.json();
       setPin(data);
       setLikes(data.likes); 
-
-      // Comprobar si el usuario ya dio like a este pin
-      const likeRes = await fetch(`http://localhost:4000/likes?pin_id=${pinId}&user_id=${userID}`);
-      const likeData = await likeRes.json();
-      if (likeData.exists) {
-        setHasLiked(true); 
+  
+      // Comprueba el estado del like si userID está definido
+      if (userID) {
+        const likeRes = await fetch(`http://localhost:4000/likes?pin_id=${pinId}&user_id=${userID}`);
+        if (!likeRes.ok) throw new Error('Error al verificar el estado del like');
+        const likeData = await likeRes.json();
+        setHasLiked(!!likeData.exists); // true si existe el like, false si no
       }
     } catch (error) {
       console.error('Error al cargar el pin:', error);
     }
   };
+  
+  
 
  
 
@@ -61,16 +64,15 @@ export default function Pin() {
   
         const data = await res.json();
   
-        // Si el like se eliminó correctamente, actualizamos el estado
+        
         if (data.message === "Like eliminado") {
-          setLikes((prevLikes) => prevLikes - 1); // Reducir el contador de likes
-          setHasLiked(false); // Cambiar el estado a no tener like
-          setErrorMessage(""); // Limpiar mensaje de error
+          setLikes((prevLikes) => prevLikes - 1); 
+          setHasLiked(false); 
+          setErrorMessage(""); 
         } else {
           setErrorMessage("Hubo un problema al eliminar el like.");
         }
       } else {
-        // Si no le ha dado like, agregamos el like
         const res = await fetch(`http://localhost:4000/likes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -86,8 +88,9 @@ export default function Pin() {
           setLikes((prevLikes) => prevLikes + 1); // Incrementar el contador de likes
           setHasLiked(true); // Cambiar el estado a tener like
           setErrorMessage(""); // Limpiar mensaje de error
+          console.log("se agrego")
         } else {
-          setErrorMessage("Hubo un problema al agregar el like.");
+          ;
         }
       }
     } catch (error) {

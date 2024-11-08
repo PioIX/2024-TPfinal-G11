@@ -95,9 +95,9 @@ app.get('/pins', async (req, res) => {
 });
 
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
-app.use(bodyParser.json({ limit: '10mb' })); // Cambia a 2mb o el tamaño que desees
+
+app.use(express.json({ limit: '100mb' }));  // Para el JSON
+app.use(express.urlencoded({ extended: false, limit: '100mb' })); // Para formularios
 
 
 // Crear un nuevo pin
