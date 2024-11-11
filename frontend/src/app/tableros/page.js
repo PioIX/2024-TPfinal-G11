@@ -37,21 +37,26 @@ function Boards() {
 
   return (
     <div>
-      {groupedPins.map((categoryData) => (
-        <div key={categoryData.category}>
-          <h2>{categoryData.category}</h2>
-          <div className="pin-container">
-            {categoryData.pins.map((pin) => (
-              <div key={pin.id} className="pin">
-                <img src={pin.imageUrl} alt={pin.title} />
-                <h3>{pin.title}</h3>
-                <p>{pin.description}</p>
-              </div>
-            ))}
+  {groupedPins.map((categoryData) => (
+    <div key={categoryData.category}>
+      <h2>{categoryData.category}</h2>
+      <div className="pin-container">
+        {categoryData.pins.map((pin) => (
+          <div key={pin.id} className="pin">
+            <img
+              src={pin.image_url}  
+              alt={pin.title}
+              className="pin-image" 
+            />
+            <h3>{pin.title}</h3>
+            <p>{pin.description}</p>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
+  ))}
+</div>
+
   );
 }
 

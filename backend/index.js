@@ -273,3 +273,60 @@ app.get('/boards', async (req, res) => {
   }
 });
 
+// Ruta para agregar un comentario
+app.post('/comments', async (req, res) => {
+  const { pin_id, user_id, comment_text } = req.body;
+
+  if (!pin_id || !user_id || !comment_text) {
+    return res.status(400).json({ error: 'El pin_id, user_id y comment_text son requeridos' });
+  }
+
+  try {
+    const result = await db.query(
+      'INSERT INTO comments (pin_id, user_id, comment_text) VALUES (?, ?, ?)',
+      [pin_id, user_id, comment_text]
+    );
+    const newComment = {
+      id: result.insertId,
+      pin_id,
+      user_id,
+      comment_text,
+      created_at: new Date().toISOString()
+    };
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error('Error al agregar comentario:', error);
+    res.status(500).json({ error: 'Error al agregar comentario' });
+  }
+});
+// Socket.IO para manejar los comentarios
+io.on('connection', (socket) => {
+  console.log('Cliente conectado');
+
+  // Escuchar evento de nuevo comentario
+  socket.on('new-comment', async (pinId, userId, commentText) => {
+    // Agregar comentario a la base de datos
+    try {
+      const result = await db.query(
+        'INSERT INTO comments (pin_id, user_id, comment_text) VALUES (?, ?, ?)',
+        [pinId, userId, commentText]
+      );
+      const newComment = {
+        id: result.insertId,
+        pin_id: pinId,
+        user_id: userId,
+        comment_text: commentText,
+        created_at: new Date().toISOString()
+      };
+
+      // Emitir el nuevo comentario a todos los clientes
+      io.emit('new-comment', newComment);
+    } catch (error) {
+      console.error('Error al agregar comentario:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado');
+  });
+});

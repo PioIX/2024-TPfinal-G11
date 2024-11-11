@@ -42,6 +42,10 @@ export default function Home() {
     router.push('/inicio/login');
   };
 
+  const Tableros = () => {
+    router.push('/tableros');
+  };
+
   const handleImageUpload = async () => {
     if (!image || !title || !description || !category) {
       alert('Por favor, proporciona un título, una descripción, una imagen y selecciona una categoría.');
@@ -101,13 +105,18 @@ export default function Home() {
   }, {});
   
 
+
+
 return (
     <div className={styles.container}>
       <div className={styles.actions}>
         <button className={styles.button} onClick={handleLogout}>
           Cerrar Sesión
         </button>
-        <button className={styles.button}>Tableros</button>
+        <button className={styles.button} onClick={Tableros}>
+  Tableros
+</button>
+
         
         <input
           type="text"

@@ -69,3 +69,43 @@
   background-color: #A275BD; /* Fondo rojo cuando tiene like */
   color: white; /* Texto en blanco cuando tiene like */
 }
+
+
+.commentsList {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.comment {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.commentInput {
+  display: flex;
+  flex-direction: column;
+}
+
+.textarea {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  resize: vertical;
+}
+
+.button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
