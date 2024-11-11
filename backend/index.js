@@ -148,21 +148,6 @@ app.get('/pins/:id', async (req, res) => {
 });
 
 
-
-// Socket.IO
-io.on("connection", (socket) => {
-  console.log("Cliente conectado");
-
-  socket.on("like_pin", async (pinId) => {
-    await db.query('UPDATE pins SET likes = likes + 1 WHERE id = ?', [pinId]);
-    io.emit("update_likes", { pinId });
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado");
-  });
-});
-
 // Iniciar servidor
 server.listen(LISTEN_PORT, () => {
   console.log(`Servidor NodeJS corriendo en http://localhost:${LISTEN_PORT}/`);
@@ -265,4 +250,26 @@ io.on("connection", (socket) => {
   });
 });
 
+
+app.get('/boards', async (req, res) => {
+  try {
+    const query = `
+    SELECT category, JSON_ARRAYAGG(JSON_OBJECT(
+      'id', id,
+      'title', title,
+      'image_url', image_url,
+      'description', description,
+      'likes', likes,
+      'category', category
+    )) AS pins
+    FROM pins
+    GROUP BY category;
+    `;
+    const [rows] = await db.query(query);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener los tableros');
+  }
+});
 

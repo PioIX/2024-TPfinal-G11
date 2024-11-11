@@ -28,7 +28,6 @@ export default function Home() {
     try {
       const res = await fetch('http://localhost:4000/pins', {
         method: 'GET',
-        credentials: 'include' 
       });
       if (!res.ok) throw new Error('Error al cargar pins');
       const data = await res.json();
