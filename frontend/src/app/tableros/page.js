@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
+import styles from "../styles/Tableros.module.css";
 
 function Boards() {
   const [groupedPins, setGroupedPins] = useState([]);
@@ -36,21 +37,21 @@ function Boards() {
   }
 
   return (
-    <div>
-  {groupedPins.map((categoryData) => (
-    <div key={categoryData.category}>
-      <h2>{categoryData.category}</h2>
-      <div className="pin-container">
-        {categoryData.pins.map((pin) => (
-          <div key={pin.id} className="pin">
-            <img
-              src={pin.image_url}  
-              alt={pin.title}
-              className="pin-image" 
-            />
-            <h3>{pin.title}</h3>
-            <p>{pin.description}</p>
-          </div>
+    <div className={styles.boardsContainer}>
+    {groupedPins.map((categoryData) => (
+      <div key={categoryData.category} className={styles.categorySection}>
+        <h2 className={styles.categoryTitle}>{categoryData.category}</h2>
+        <div className={styles.pinContainer}>
+          {categoryData.pins.map((pin) => (
+            <div key={pin.id} className={styles.pin}>
+              <img
+                src={pin.image_url}
+                alt={pin.title}
+                className={styles.pinImage}
+              />
+              <h3 className={styles.pinTitle}>{pin.title}</h3>
+              <p className={styles.pinDescription}>{pin.description}</p>
+            </div>
         ))}
       </div>
     </div>

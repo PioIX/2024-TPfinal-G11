@@ -26,3 +26,70 @@
   object-fit: cover;  /* Esto asegura que la imagen cubra el área sin distorsionarse */
   border-radius: 8px;  /* Bordes redondeados si lo deseas */
 }
+
+.boards-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f7f7f7;
+}
+
+/* Estilo para cada sección de categoría */
+.category-section {
+  margin-bottom: 40px;
+}
+
+/* Estilo del título de cada categoría */
+.category-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Estilo para el contenedor de los pins */
+.pin-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 0 10px;
+}
+
+/* Estilo para cada pin individual */
+.pin {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Hover effect para los pins */
+.pin:hover {
+  transform: translateY(-10px);
+}
+
+/* Estilo para la imagen del pin */
+.pin-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+/* Estilo para el título del pin */
+.pin-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px;
+  color: #333;
+}
+
+/* Estilo para la descripción del pin */
+.pin-description {
+  font-size: 14px;
+  margin: 0 10px 15px;
+  color: #666;
+  line-height: 1.4;
+}

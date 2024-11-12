@@ -1,3 +1,11 @@
+.button, 
+.likeButton, 
+.selectCategory, 
+.uploadFileButton label {
+    font-family:'Courier New', Courier, monospace; /* Fuente común para todos los botones */
+    font-size: 1rem; /* Tamaño de fuente común para todos */
+    text-transform: uppercase; /* Transformar el texto a mayúsculas si prefieres */
+}
 .container {
     background-image: url('/images/background.jpg');
     background-size: 93% cover;
