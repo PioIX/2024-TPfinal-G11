@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/compat/router';
 import styles from "../styles/Pin.module.css";
 import { useSearchParams } from 'next/navigation';
+import { useSocket } from '../../hooks/useSocket';
 
 export default function Pin() {
   const router = useRouter();
@@ -14,6 +15,9 @@ export default function Pin() {
   const [hasLiked, setHasLiked] = useState(false); 
   const [pin, setPin] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const {socket,isConnected} = useSocket();
 
   useEffect(() => {
     const storedUserID = localStorage.getItem('userID');
@@ -24,21 +28,50 @@ export default function Pin() {
     }
   }, [id, userID]);
 
+  
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("new-comment", (data) => {
+      console.log("Nuevo comentario recibido:", data);
+      let comentariosTemporal = comments;
+      comentariosTemporal.push(data);
+      setComments(comentariosTemporal);
+    });
+
+    return () => {
+      socket.off("new-comment");
+    };
+  }, [socket, isConnected]);
+
+  function handleCommentSubmit() {
+    console.log("HOLAAaaa", newComment);
+
+    const commentData = {
+      pin_id: id,
+      user_id: userID,
+      comment_text: newComment,
+    };
+
+    console.log("Todos los comentarios son: ",comments)
+    setNewComment("");
+    socket.emit("send-comment", commentData);
+    
+  }
+
   const fetchPin = async (pinId) => {
     try {
-      // Obtiene los datos del pin
       const res = await fetch(`http://localhost:4000/pins/${pinId}`);
       if (!res.ok) throw new Error('Error al cargar el pin');
       const data = await res.json();
       setPin(data);
       setLikes(data.likes); 
   
-      // Comprueba el estado del like si userID está definido
       if (userID) {
         const likeRes = await fetch(`http://localhost:4000/likes?pin_id=${pinId}&user_id=${userID}`);
         if (!likeRes.ok) throw new Error('Error al verificar el estado del like');
         const likeData = await likeRes.json();
-        setHasLiked(!!likeData.exists); // true si existe el like, false si no
+        setHasLiked(!!likeData.exists); 
       }
     } catch (error) {
       console.error('Error al cargar el pin:', error);
@@ -53,7 +86,6 @@ export default function Pin() {
     try {
       setHasLiked(true);
       if (hasLiked) {
-        // Si el usuario ya le dio like, eliminamos el like
         const res = await fetch(`http://localhost:4000/likes`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
@@ -83,11 +115,11 @@ export default function Pin() {
   
         const data = await res.json();
   
-        // Si el like se añadió con éxito, actualizamos el estado
+      
         if (data.message === "Like agregado") {
-          setLikes((prevLikes) => prevLikes + 1); // Incrementar el contador de likes
-          setHasLiked(true); // Cambiar el estado a tener like
-          setErrorMessage(""); // Limpiar mensaje de error
+          setLikes((prevLikes) => prevLikes + 1); 
+          setHasLiked(true); 
+          setErrorMessage(""); 
           console.log("se agrego")
         } else {
           ;
@@ -118,6 +150,28 @@ export default function Pin() {
 
     
       {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
+
+      <div className={styles.chatContainer}>
+        <h3>Comentarios</h3>
+        <div className={styles.comments}>
+          {comments.map((comment) => (
+            <div key={comment.id} className={styles.comment}>
+              <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.commentInput}>
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Escribe un comentario..."
+            className={styles.commentInputField}
+          />
+          <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
+        </div>
+      </div>
     </div>
   );
 }

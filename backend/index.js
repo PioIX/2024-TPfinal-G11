@@ -304,7 +304,7 @@ io.on('connection', (socket) => {
   console.log('Cliente conectado');
 
   // Escuchar evento de nuevo comentario
-  socket.on('new-comment', async (pinId, userId, commentText) => {
+  socket.on('send-comment', async (pinId, userId, commentText) => {
     // Agregar comentario a la base de datos
     try {
       const result = await db.query(
@@ -312,7 +312,7 @@ io.on('connection', (socket) => {
         [pinId, userId, commentText]
       );
       const newComment = {
-        id: result.insertId,
+        id: result.id,
         pin_id: pinId,
         user_id: userId,
         comment_text: commentText,
