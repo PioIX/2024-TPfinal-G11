@@ -1,25 +1,26 @@
 {
-    "name": "node_base",
-    "version": "1.0.0",
-    "description": "Proyecto base de Desarrollo de Aplicaciones Informáticas - Proyecto de Producción - Pio IX",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon index"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "body-parser": "^1.19.0",
-        "cors": "^2.8.5",
-        "express": "^4.17.1",
-        "express-session": "^1.17.3",
-        "express-ws": "^5.0.2",
-        "http": "0.0.0",
-        "mysql2": "^3.11.1",
-        "next": "^15.0.2",
-        "nodemon": "^3.1.4",
-        "socket.io": "^4.7.2"
-    }
+  "name": "node_base",
+  "version": "1.0.0",
+  "description": "Proyecto base de Desarrollo de Aplicaciones Informáticas - Proyecto de Producción - Pio IX",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.3",
+    "express-ws": "^5.0.2",
+    "http": "0.0.0",
+    "mysql2": "^3.11.1",
+    "next": "^15.0.2",
+    "nodemon": "^3.1.4",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {}
 }
