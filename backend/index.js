@@ -299,27 +299,33 @@ app.post('/comments', async (req, res) => {
     res.status(500).json({ error: 'Error al agregar comentario' });
   }
 });
-// Socket.IO para manejar los comentarios
+
+
+
+
+
+
+
 io.on('connection', (socket) => {
   console.log('Cliente conectado');
 
-  // Escuchar evento de nuevo comentario
-  socket.on('send-comment', async (pinId, userId, commentText) => {
-    // Agregar comentario a la base de datos
+
+  socket.on('send-comment', async commentData => {
+
+    console.log(commentData);
     try {
       const result = await db.query(
-        'INSERT INTO comments (pin_id, user_id, comment_text) VALUES (?, ?, ?)',
-        [pinId, userId, commentText]
+        `INSERT INTO comments (pin_id, user_id, comment_text) VALUES (${commentData.pin_id}, ${commentData.user_id}, '${commentData.comment_text}')`
       );
       const newComment = {
         id: result.id,
-        pin_id: pinId,
-        user_id: userId,
-        comment_text: commentText,
+        pin_id: commentData.pin_id,
+        user_id: commentData.user_id, 
+        comment_text: commentData.comment_text,
         created_at: new Date().toISOString()
       };
 
-      // Emitir el nuevo comentario a todos los clientes
+    
       io.emit('new-comment', newComment);
     } catch (error) {
       console.error('Error al agregar comentario:', error);
