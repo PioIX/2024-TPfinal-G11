@@ -135,6 +135,7 @@ export default function Pin() {
   if (!pin) return <div>Cargando...</div>;
 
   return (
+    <div className={styles.container}>
     <div className={styles.pinContainer}>
       <img src={pin.image_url} alt={pin.title} className={styles.image} />
       <h1 className={styles.pinTitle}>{pin.title}</h1>
@@ -171,6 +172,7 @@ export default function Pin() {
           />
           <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,11 +1,13 @@
 "use client"
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';  
 import styles from "../styles/Tableros.module.css";
 
 function Boards() {
   const [groupedPins, setGroupedPins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
 
   useEffect(() => {
     const fetchBoards = async () => {
@@ -25,6 +27,11 @@ function Boards() {
       }
     };
 
+
+   const handleLogout = () => {
+      router.push('/inicio/home');
+    };
+
     fetchBoards();
   }, []);
 
@@ -37,6 +44,9 @@ function Boards() {
   }
 
   return (
+    <div className={styles.container}>
+    <div className={styles.actions}>
+    <div className={styles.container}>
     <div className={styles.boardsContainer}>
     {groupedPins.map((categoryData) => (
       <div key={categoryData.category} className={styles.categorySection}>
@@ -44,6 +54,9 @@ function Boards() {
         <div className={styles.pinContainer}>
           {categoryData.pins.map((pin) => (
             <div key={pin.id} className={styles.pin}>
+              <button className={styles.button} onClick={handleLogout}>
+        Cerrar Sesión
+      </button>
               <img
                 src={pin.image_url}
                 alt={pin.title}
@@ -54,8 +67,11 @@ function Boards() {
             </div>
         ))}
       </div>
-    </div>
+      </div>
   ))}
+</div>
+</div>
+</div>
 </div>
 
   );
