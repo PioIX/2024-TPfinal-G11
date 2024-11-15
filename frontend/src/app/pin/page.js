@@ -31,32 +31,26 @@ export default function Pin() {
   
   useEffect(() => {
     if (!socket) return;
-
+  
     socket.on("new-comment", (data) => {
-      console.log("Nuevo comentario recibido:", data);
-      let comentariosTemporal = comments;
-      comentariosTemporal.push(data);
-      setComments(comentariosTemporal);
+      setComments((prevComments) => [...prevComments, data]);
+      console.log("Todos mis comentarios son:", [...comments, data]);
     });
-
+  
+    // Limpieza para evitar duplicados de eventos
     return () => {
       socket.off("new-comment");
     };
-  }, [socket, isConnected]);
+  }, [socket, comments]);
 
   function handleCommentSubmit() {
-    console.log("HOLAAaaa", newComment);
-
     const commentData = {
       pin_id: id,
       user_id: userID,
       comment_text: newComment,
     };
-
-    console.log("Todos los comentarios son: ",comments)
     setNewComment("");
     socket.emit("send-comment", commentData);
-    
   }
 
   const fetchPin = async (pinId) => {
@@ -154,8 +148,8 @@ export default function Pin() {
       <div className={styles.chatContainer}>
         <h3>Comentarios</h3>
         <div className={styles.comments}>
-          {comments.map((comment) => (
-            <div key={comment.id} className={styles.comment}>
+          {comments.map((comment, index) => (
+            <div key={index} className={styles.comment}>
               <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
             </div>
           ))}

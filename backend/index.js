@@ -40,7 +40,12 @@ io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
-// Rutas de autenticación
+// Iniciar servidor
+server.listen(LISTEN_PORT, () => {
+  console.log(`Servidor NodeJS corriendo en http://localhost:${LISTEN_PORT}/`);
+});
+
+//REGISTRARSE
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -59,6 +64,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
+//LOGIN
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -79,7 +85,7 @@ app.post('/login', async (req, res) => {
 
 
 
-
+//OBTENER PINS
 app.get('/pins', async (req, res) => {
   try {
     const [pins] = await db.query(`
@@ -93,14 +99,31 @@ app.get('/pins', async (req, res) => {
     res.status(500).json({ error: 'Error al cargar pins' });
   }
 });
+app.get('/pins/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [pin] = await db.query(`
+      SELECT pins.*, users.username 
+      FROM pins 
+      JOIN users ON pins.user_id = users.id 
+      WHERE pins.id = ?
+    `, [id]);
+    if (pin.length === 0) {
+      return res.status(404).json({ error: 'Pin no encontrado' });
+    }
+    res.json(pin[0]);
+  } catch (error) {
+    console.error('Error al cargar el pin:', error);
+    res.status(500).json({ error: 'Error al cargar el pin' });
+  }
+});
 
 
-
+// TAMAÑO DE LAS IMAGENES NO ANDA:(
 app.use(express.json({ limit: '100mb' }));  // Para el JSON
 app.use(express.urlencoded({ extended: false, limit: '100mb' })); // Para formularios
 
-
-// Crear un nuevo pin
+//AGREGAR PINS
 app.post('/pins', async (req, res) => {
   const { title, image_base64, userID, description, category } = req.body;
   if (!title || !image_base64 || !description || !category) {
@@ -126,49 +149,18 @@ app.post('/pins', async (req, res) => {
 });
 
 
-
-// Obtener un pin específico por ID
-app.get('/pins/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const [pin] = await db.query(`
-      SELECT pins.*, users.username 
-      FROM pins 
-      JOIN users ON pins.user_id = users.id 
-      WHERE pins.id = ?
-    `, [id]);
-    if (pin.length === 0) {
-      return res.status(404).json({ error: 'Pin no encontrado' });
-    }
-    res.json(pin[0]);
-  } catch (error) {
-    console.error('Error al cargar el pin:', error);
-    res.status(500).json({ error: 'Error al cargar el pin' });
-  }
-});
-
-
-// Iniciar servidor
-server.listen(LISTEN_PORT, () => {
-  console.log(`Servidor NodeJS corriendo en http://localhost:${LISTEN_PORT}/`);
-});
-
-
-
-// Ruta para agregar o quitar un like
+//LIKES
 app.post('/likes', async (req, res) => {
   const { pin_id, user_id } = req.body;
 
   try {
-    // Verificar si ya existe un like para este pin y usuario
     const [existingLike] = await db.query(
       'SELECT * FROM likes WHERE pin_id = ? AND user_id = ?',
       [pin_id, user_id]
     );
 
     if (existingLike.length > 0) {
-      // Si ya existe el like, actualizarlo para alternar entre like y dislike
-      const newLikeStatus = existingLike[0].liked ? false : true; // Alterna entre true y false
+      const newLikeStatus = existingLike[0].liked ? false : true; 
       await db.query(
         'UPDATE likes SET liked = ? WHERE pin_id = ? AND user_id = ?',
         [newLikeStatus, pin_id, user_id]
@@ -176,7 +168,6 @@ app.post('/likes', async (req, res) => {
       return res.json({ message: newLikeStatus ? 'Like agregado' : 'Like eliminado' });
     }
 
-    // Si no existe el like, crearlo con el valor 'true' (liked)
     await db.query(
       'INSERT INTO likes (pin_id, user_id, liked) VALUES (?, ?, ?)',
       [pin_id, user_id, true]
@@ -189,12 +180,11 @@ app.post('/likes', async (req, res) => {
   }
 });
 
-
+//SACAR LIKE
 app.delete('/likes', async (req, res) => {
   const { pin_id, user_id } = req.body;
 
   try {
-    // Verificar si el like existe
     const [existingLike] = await db.query('SELECT * FROM likes WHERE pin_id = ? AND user_id = ?', [pin_id, user_id]);
     
     if (existingLike.length === 0) {
@@ -223,7 +213,7 @@ io.on("connection", (socket) => {
       [pinId, userId]
     );
 
-    let likeStatus = false; // Default: no like
+    let likeStatus = false; 
 
     if (existingLike.length > 0) {
       // Si existe, alternar entre true y false
@@ -251,6 +241,7 @@ io.on("connection", (socket) => {
 });
 
 
+//TABLEROS
 app.get('/boards', async (req, res) => {
   try {
     const query = `
@@ -273,7 +264,7 @@ app.get('/boards', async (req, res) => {
   }
 });
 
-// Ruta para agregar un comentario
+//AGREGAR COMENTARIOS
 app.post('/comments', async (req, res) => {
   const { pin_id, user_id, comment_text } = req.body;
 
@@ -299,27 +290,33 @@ app.post('/comments', async (req, res) => {
     res.status(500).json({ error: 'Error al agregar comentario' });
   }
 });
-// Socket.IO para manejar los comentarios
+
+
+
+
+
+
+//COMENTARIOS CONECCION
 io.on('connection', (socket) => {
   console.log('Cliente conectado');
 
-  // Escuchar evento de nuevo comentario
-  socket.on('send-comment', async (pinId, userId, commentText) => {
-    // Agregar comentario a la base de datos
+
+  socket.on('send-comment', async commentData => {
+
+    console.log(commentData);
     try {
       const result = await db.query(
-        'INSERT INTO comments (pin_id, user_id, comment_text) VALUES (?, ?, ?)',
-        [pinId, userId, commentText]
+        `INSERT INTO comments (pin_id, user_id, comment_text) VALUES (${commentData.pin_id}, ${commentData.user_id}, '${commentData.comment_text}')`
       );
       const newComment = {
         id: result.id,
-        pin_id: pinId,
-        user_id: userId,
-        comment_text: commentText,
+        pin_id: commentData.pin_id,
+        user_id: commentData.user_id, 
+        comment_text: commentData.comment_text,
         created_at: new Date().toISOString()
       };
 
-      // Emitir el nuevo comentario a todos los clientes
+    
       io.emit('new-comment', newComment);
     } catch (error) {
       console.error('Error al agregar comentario:', error);
