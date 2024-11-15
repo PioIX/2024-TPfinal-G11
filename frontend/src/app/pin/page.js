@@ -31,15 +31,17 @@ export default function Pin() {
   
   useEffect(() => {
     if (!socket) return;
-
+  
     socket.on("new-comment", (data) => {
-      let comentariosTemporal = comments;
-      comentariosTemporal.push(data);
-      setComments(comentariosTemporal);
-      console.log("Todos mis comentarios son:",comentariosTemporal)
+      setComments((prevComments) => [...prevComments, data]);
+      console.log("Todos mis comentarios son:", [...comments, data]);
     });
-    
-  }, [socket, isConnected]);
+  
+    // Limpieza para evitar duplicados de eventos
+    return () => {
+      socket.off("new-comment");
+    };
+  }, [socket, comments]);
 
   function handleCommentSubmit() {
     const commentData = {
