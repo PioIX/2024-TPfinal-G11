@@ -1,6 +1,6 @@
 # Iconic
 
-![Logo de Iconic](file:///C:/Users/alumnodigitales1/Downloads/383209819-8bd65d90-40fd-4882-874f-1e0221e3d249.jpeg)
+![Logo de Iconic]()
 
 ## Concepto
 
