@@ -129,6 +129,11 @@ export default function Pin() {
   if (!pin) return <div>Cargando...</div>;
 
   return (
+    <div>
+    {/* Colocamos el enlace fuera del contenedor principal */}
+    <a href="../home">
+      <img className={styles["icono-volver"]} src="flecha_izquierda.png" alt="Volver atras" />
+    </a>
     <div className={styles.pinContainer}>
       <img src={pin.image_url} alt={pin.title} className={styles.image} />
       <h1 className={styles.pinTitle}>{pin.title}</h1>
@@ -166,6 +171,7 @@ export default function Pin() {
           <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
         </div>
       </div>
+    </div>
     </div>
   );
 }
