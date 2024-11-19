@@ -25,9 +25,9 @@ export default function Pin() {
 
     if (id && storedUserID) {
       fetchPin(id, storedUserID);
+      fetchComments(id); 
     }
   }, [id, userID]);
-
   
   useEffect(() => {
     if (!socket) return;
@@ -52,6 +52,19 @@ export default function Pin() {
     setNewComment("");
     socket.emit("send-comment", commentData);
   }
+
+
+  const fetchComments = async (pinId) => {
+    try {
+      const res = await fetch(`http://localhost:4000/pins/${pinId}/comments`);
+      if (!res.ok) throw new Error('Error al cargar los comentarios');
+      const data = await res.json();
+      setComments(data); // Guardar los comentarios en el estado
+    } catch (error) {
+      console.error('Error al cargar los comentarios:', error);
+    }
+  };
+
 
   const fetchPin = async (pinId) => {
     try {
@@ -130,43 +143,46 @@ export default function Pin() {
 
   return (
     <div className={styles.container}>
-    <div className={styles.pinContainer}>
-      <img src={pin.image_url} alt={pin.title} className={styles.image} />
-      <h1 className={styles.pinTitle}>{pin.title}</h1>
-      <p className={styles.pinUser}>Subido por: {pin.username}</p>
-      <h2 className={styles.pinDescription}>{pin.description}</h2>
+      <div className={styles.pinContainer}>
+        <img src={pin.image_url} alt={pin.title} className={styles.image} />
+        <h1 className={styles.pinTitle}>{pin.title}</h1>
+        <p className={styles.pinUser}>Subido por: {pin.username}</p>
+        <h2 className={styles.pinDescription}>{pin.description}</h2>
 
-      <button
-        onClick={handleLike}
-        className={`${styles.button} ${hasLiked ? styles.liked : ''}`} 
-      >
-        {hasLiked ? "Like ❤️" : "Like"} 
-      </button>
+        <button
+          onClick={handleLike}
+          className={`${styles.button} ${hasLiked ? styles.liked : ''}`} 
+        >
+          {hasLiked ? "Like ❤️" : "Like"} 
+        </button>
 
-    
-      {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
+        {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
 
-      <div className={styles.chatContainer}>
-        <h3>Comentarios</h3>
-        <div className={styles.comments}>
-          {comments.map((comment, index) => (
-            <div key={index} className={styles.comment}>
-              <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
-            </div>
-          ))}
+        <div className={styles.chatContainer}>
+          <h3>Comentarios</h3>
+          <div className={styles.comments}>
+            {comments.length === 0 ? (
+              <p>No hay comentarios aún.</p>
+            ) : (
+              comments.map((comment, index) => (
+                <div key={index} className={styles.comment}>
+                  <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className={styles.commentInput}>
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Escribe un comentario..."
+              className={styles.commentInputField}
+            />
+            <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
+          </div>
         </div>
-
-        <div className={styles.commentInput}>
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Escribe un comentario..."
-            className={styles.commentInputField}
-          />
-          <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
-        </div>
-      </div>
       </div>
     </div>
   );

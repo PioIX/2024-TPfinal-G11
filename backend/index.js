@@ -356,3 +356,20 @@ io.on('connection', (socket) => {
     console.log('Cliente desconectado');
   });
 });
+
+// COMENTARIOS POR PINS
+app.get('/pins/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [comments] = await db.query(`
+      SELECT c.*, u.username
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      WHERE c.pin_id = ?
+    `, [id]);
+    res.json(comments);
+  } catch (error) {
+    console.error('Error al cargar los comentarios:', error);
+    res.status(500).json({ error: 'Error al cargar los comentarios' });
+  }
+});
