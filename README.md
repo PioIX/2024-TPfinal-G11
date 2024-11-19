@@ -1,6 +1,6 @@
 # Iconic
 
-![Logo de Iconic]()
+![Logo de Iconic](files/0.jpg)
 
 ## Concepto
 
