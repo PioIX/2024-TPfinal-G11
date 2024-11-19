@@ -58,12 +58,13 @@
   }
   
   .pin {
-    background-color: white;
-    border-radius: 12px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
-    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    min-width: 280px; 
+    max-width: 320px; 
   }
   
   .pin:hover {

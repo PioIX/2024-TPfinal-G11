@@ -27,6 +27,13 @@
   border-radius: 8px;  /* Bordes redondeados si lo deseas */
 }
 
+.pinImage {
+  width: 300px;   /* Ancho fijo */
+  height: 300px;  /* Altura fija */
+  object-fit: cover;  /* Esto asegura que la imagen cubra el área sin distorsionarse */
+  border-radius: 8px;  /* Bordes redondeados si lo deseas */
+}
+
 .boards-container {
   padding: 20px;
   max-width: 1200px;
@@ -48,11 +55,14 @@
 }
 
 /* Estilo para el contenedor de los pins */
-.pin-container {
-  display: grid;
+.pin.Container {
+  display: flex;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   padding: 0 10px;
+  flex-wrap: nowrap; 
+  overflow-x: auto; /* Permite hacer scroll horizontal si hay muchos pins */
+  justify-content: flex-start; /* Alinea los elementos al principio de la fila */
 }
 
 /* Estilo para cada pin individual */
@@ -62,6 +72,8 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease-in-out;
+  min-width: 280px; /* Asegura que cada pin tenga un tamaño mínimo */
+  max-width: 320px; /* Limita el tamaño máximo de los pins */
 }
 
 /* Hover effect para los pins */
@@ -92,4 +104,15 @@
   margin: 0 10px 15px;
   color: #666;
   line-height: 1.4;
+}
+
+.container {
+  background-image: url('/images/background.jpg');
+  background-size: 93% cover;
+  background-position: center;
+  display: flex;
+  padding: 20px;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+
 }
