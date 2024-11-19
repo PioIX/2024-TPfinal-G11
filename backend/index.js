@@ -89,7 +89,8 @@ app.post('/login', async (req, res) => {
 app.get('/pins', async (req, res) => {
   try {
     const [pins] = await db.query(`
-      SELECT p.*, u.username 
+      SELECT p.*, u.username, 
+        (SELECT COUNT(*) FROM likes l WHERE l.pin_id = p.id) AS like_count
       FROM pins p
       JOIN users u ON p.user_id = u.id
     `);
@@ -99,6 +100,8 @@ app.get('/pins', async (req, res) => {
     res.status(500).json({ error: 'Error al cargar pins' });
   }
 });
+
+
 app.get('/pins/:id', async (req, res) => {
   const { id } = req.params;
   try {
