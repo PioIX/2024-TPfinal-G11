@@ -201,6 +201,32 @@ app.delete('/likes', async (req, res) => {
 });
 
 
+// OBTENER ESTADO LIKE
+app.get('/likes', (req, res) => {
+  const { pin_id, user_id } = req.query;
+
+  if (!pin_id || !user_id) {
+    return res.status(400).json({ error: 'Faltan parámetros pin_id o user_id' });
+  }
+
+  const query = `
+    SELECT EXISTS (
+      SELECT 1 FROM likes WHERE pin_id = ? AND user_id = ?
+    ) AS \`exists\`
+  `;
+
+  db.query(query, [pin_id, user_id], (err, results) => {
+    if (err) {
+      console.error('Error en la base de datos:', err);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+
+    res.json({ exists: !!results[0].exists });
+  });
+});
+
+
+
 
 // Socket.IO para manejar el like de un pin
 io.on("connection", (socket) => {

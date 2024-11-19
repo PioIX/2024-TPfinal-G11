@@ -175,6 +175,7 @@ return (
             <p className={styles.pinUser}>Subido por: {pin.username}</p>
             <p className={styles.pinDescription}>{pin.description}</p> 
             <p className={styles.pinLikes}>{pin.likes} Likes❤️</p>
+            
           </div>
         ))}
       </div>
