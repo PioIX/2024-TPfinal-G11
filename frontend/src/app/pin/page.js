@@ -166,7 +166,7 @@ export default function Pin() {
             ) : (
               comments.map((comment, index) => (
                 <div key={index} className={styles.comment}>
-                  <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
+                  <strong>{comment.user_id === userID ? "Yo" : comment.username}:</strong> {comment.comment_text}
                 </div>
               ))
             )}
