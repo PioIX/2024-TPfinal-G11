@@ -1,9 +1,11 @@
 .pin {
-  width: 320px;  /* Un tamaño fijo para cada tarjeta */
+  width: 320px;
+  /* Un tamaño fijo para cada tarjeta */
   padding: 10px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el efecto de tarjeta */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Sombra para el efecto de tarjeta */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,11 +22,13 @@
   font-size: 14px;
   text-align: center;
 }
+
 .pin-image {
-  width: 300px;   /* Ancho fijo */
-  height: 300px;  /* Altura fija */
-  object-fit: cover;  /* Esto asegura que la imagen cubra el área sin distorsionarse */
-  border-radius: 8px;  /* Bordes redondeados si lo deseas */
+  max-height: 180px; 
+  object-fit: cover;
+  /* Esto asegura que la imagen cubra el área sin distorsionarse */
+  border-radius: 8px;
+  /* Bordes redondeados si lo deseas */
 }
 
 .pinImage {
@@ -53,12 +57,12 @@
   margin-bottom: 20px;
   color: #333;
 }
-
 /* Estilo para el contenedor de los pins */
-.pin.Container {
+.pin-container {
   display: flex;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  flex-wrap: wrap;
   gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   padding: 0 10px;
   flex-wrap: nowrap; 
   overflow-x: auto; /* Permite hacer scroll horizontal si hay muchos pins */
@@ -67,13 +71,14 @@
 
 /* Estilo para cada pin individual */
 .pin {
+  
+  margin: 10px 0; 
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease-in-out;
-  min-width: 280px; /* Asegura que cada pin tenga un tamaño mínimo */
-  max-width: 320px; /* Limita el tamaño máximo de los pins */
+  margin-bottom: 20px;  /* Margen inferior entre los pins */
 }
 
 /* Hover effect para los pins */
@@ -84,15 +89,16 @@
 /* Estilo para la imagen del pin */
 .pin-image {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* Permite la imagen a ajustarse según el tamaño del contenedor */
+  max-height: 200px; /* Limita la altura máxima de la imagen */
+  object-fit: cover; /* Asegura que la imagen no se distorsione */
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
 
 /* Estilo para el título del pin */
 .pin-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   margin: 10px;
   color: #333;
@@ -100,19 +106,37 @@
 
 /* Estilo para la descripción del pin */
 .pin-description {
-  font-size: 14px;
+  font-size: 12px;
   margin: 0 10px 15px;
   color: #666;
   line-height: 1.4;
 }
+.pinContainer {
+  grid-template-columns: 1fr 1fr 1fr;
+  display: grid;
+}
 
-.container {
+.pinImage {
+  max-height: 150px; /* Ajustar aún más para pantallas muy pequeñas */
+}
+
+.pinTitle {
+  font-size: 16px; /* Reducir más el tamaño del título */
+}
+
+.pinDescription {
+  font-size: 14px;
+}
+
+
+.icono-volver {
+  width: 50px;
+  height: 50px;
+  height: auto; /* Mantiene las proporciones */
+  object-fit: contain; /* Ajusta cómo se escala la imagen */
+}
+
+.div {
   background-image: url('/images/background.jpg');
-  background-size: 93% cover;
-  background-position: center;
-  display: flex;
-  padding: 20px;
-  background-color: #f9f9f9;
-  min-height: 100vh;
-
+  background-size: 102% auto;
 }
