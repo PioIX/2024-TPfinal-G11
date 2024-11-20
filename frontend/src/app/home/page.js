@@ -13,7 +13,6 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const router = useRouter();
 
-
   useEffect(() => {
     const storedUserID = localStorage.getItem('userID');
     if (storedUserID) {
@@ -51,13 +50,13 @@ export default function Home() {
       alert('Por favor, proporciona un título, una descripción, una imagen y selecciona una categoría.');
       return;
     }
-  
+
     const reader = new FileReader();
-  
+
     reader.onloadend = async () => {
       const base64Image = reader.result;
       const storedUserID = localStorage.getItem('userID');
-  
+
       const newPin = {
         title,
         description,
@@ -65,31 +64,30 @@ export default function Home() {
         userID: storedUserID,
         category, 
       };
-  
+
       try {
         const res = await fetch('http://localhost:4000/pins', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newPin),
         });
-  
+
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         const createdPin = await res.json();
         setPins((prevPins) => [...prevPins, createdPin]);
-  
+
         setTitle('');
         setDescription('');
         setImage(null);
-        setCategory(''); 
+        setCategory('');
       } catch (error) {
         console.error('Error al subir imagen:', error);
         alert('No se pudo subir la imagen.');
       }
     };
-  
-    reader.readAsDataURL(image); 
+
+    reader.readAsDataURL(image);
   };
-  
 
   function handleClick(pin) {
     console.log(pin.id);
@@ -103,21 +101,21 @@ export default function Home() {
     acc[category].push(pin);
     return acc;
   }, {});
-  
 
 
 
-return (
+
+
+  return (
     <div className={styles.container}>
       <div className={styles.actions}>
         <button className={styles.button} onClick={handleLogout}>
           Cerrar Sesión
         </button>
         <button className={styles.button} onClick={Tableros}>
-  Tableros
-</button>
+          Tableros
+        </button>
 
-        
         <input
           type="text"
           placeholder="Título de la imagen"
@@ -134,15 +132,15 @@ return (
           className={styles.textarea}
         ></textarea>
       
-      <div className={styles.uploadFileButton}>
-  <label htmlFor="fileInput">Seleccionar archivo</label>
-  <input
-    type="file"
-    id="fileInput"
-    onChange={(e) => setImage(e.target.files[0])}
-    required
-  />
-</div>
+        <div className={styles.uploadFileButton}>
+          <label htmlFor="fileInput">Seleccionar archivo</label>
+          <input
+            type="file"
+            id="fileInput"
+            onChange={(e) => setImage(e.target.files[0])}
+            required
+          />
+        </div>
   
         <select
           value={category}
@@ -153,6 +151,11 @@ return (
           <option value="Arte">Arte</option>
           <option value="Tecnología">Tecnología</option>
           <option value="Diseño">Diseño</option>
+          <option value="Paisaje">Paisaje</option>
+          <option value="Animales">Animales</option>
+          <option value="Memes">Memes</option>
+          <option value="Musica">Musica</option>
+          <option value="Otro">Otro</option>
         </select>
   
         <button 
@@ -174,9 +177,10 @@ return (
             <h3 className={styles.pinTitle}>{pin.title}</h3>
             <p className={styles.pinUser}>Subido por: {pin.username}</p>
             <p className={styles.pinDescription}>{pin.description}</p> 
-            <p className={styles.pinLikes}>{pin.likes} Likes❤️</p>
+            <p className={styles.pinLikes}>{pin.like_count} Likes❤️</p> 
           </div>
         ))}
+        
       </div>
     </div>
   );

@@ -1,15 +1,13 @@
 /* Authentication.module.css */
+
+
 .body {
   background-image: url('/images/background.jpg');
-  background-size: 93% auto;
+  background-size: 100% auto;
 
 }
 
-.container {
-  background-image: url('/images/background.jpg');
-  background-size: 93% auto;
 
-}
 
 .form {
   display: flex;

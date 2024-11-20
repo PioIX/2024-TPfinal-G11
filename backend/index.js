@@ -89,7 +89,8 @@ app.post('/login', async (req, res) => {
 app.get('/pins', async (req, res) => {
   try {
     const [pins] = await db.query(`
-      SELECT p.*, u.username 
+      SELECT p.*, u.username, 
+        (SELECT COUNT(*) FROM likes l WHERE l.pin_id = p.id) AS like_count
       FROM pins p
       JOIN users u ON p.user_id = u.id
     `);
@@ -99,6 +100,8 @@ app.get('/pins', async (req, res) => {
     res.status(500).json({ error: 'Error al cargar pins' });
   }
 });
+
+
 app.get('/pins/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -199,6 +202,32 @@ app.delete('/likes', async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar like' });
   }
 });
+
+
+// OBTENER ESTADO LIKE
+app.get('/likes', (req, res) => {
+  const { pin_id, user_id } = req.query;
+
+  if (!pin_id || !user_id) {
+    return res.status(400).json({ error: 'Faltan parámetros pin_id o user_id' });
+  }
+
+  const query = `
+    SELECT EXISTS (
+      SELECT 1 FROM likes WHERE pin_id = ? AND user_id = ?
+    ) AS \`exists\`
+  `;
+
+  db.query(query, [pin_id, user_id], (err, results) => {
+    if (err) {
+      console.error('Error en la base de datos:', err);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+
+    res.json({ exists: !!results[0].exists });
+  });
+});
+
 
 
 
@@ -327,3 +356,22 @@ io.on('connection', (socket) => {
     console.log('Cliente desconectado');
   });
 });
+
+// COMENTARIOS POR PINS
+app.get('/pins/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [comments] = await db.query(`
+      SELECT c.*, u.username
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      WHERE c.pin_id = ?
+    `, [id]);
+    res.json(comments);
+  } catch (error) {
+    console.error('Error al cargar los comentarios:', error);
+    res.status(500).json({ error: 'Error al cargar los comentarios' });
+  }
+});
+
+

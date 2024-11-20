@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';  
 import styles from "../styles/Tableros.module.css";
 
 
@@ -10,6 +11,7 @@ function Boards() {
   const [groupedPins, setGroupedPins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
 
   useEffect(() => {
     const fetchBoards = async () => {
@@ -27,6 +29,11 @@ function Boards() {
         setError(err.message);
         setLoading(false);
       }
+    };
+
+
+   const handleLogout = () => {
+      router.push('/inicio/home');
     };
 
     fetchBoards();
