@@ -375,28 +375,3 @@ app.get('/pins/:id/comments', async (req, res) => {
 });
 
 
-//ELIMINAR PINS 
-const correctPassword = "ICONIC"; // Contraseña secreta para eliminar pines
-
-// Ruta para eliminar un pin
-app.delete('/pins/:id', async (req, res) => {
-  const { id } = req.params;
-  const { password } = req.body;  // La contraseña enviada desde el cliente
-  
-  if (password !== correctPassword) {
-    return res.status(403).json({ error: 'Contraseña incorrecta.' });
-  }
-
-  try {
-    const result = await pool.query('DELETE FROM pins WHERE id = $1 RETURNING *', [id]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Pin no encontrado.' });
-    }
-
-    res.status(200).json({ message: 'Pin eliminado correctamente' });
-  } catch (error) {
-    console.error('Error al eliminar pin:', error);
-    res.status(500).json({ error: 'Hubo un error al eliminar el pin.' });
-  }
-});

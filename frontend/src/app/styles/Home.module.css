@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap');
+
+.container {
+  font-family: 'Sour Gummy', sans-serif;
+}
+
+
+
 .button, 
 .likeButton, 
 .selectCategory, 
@@ -8,7 +16,7 @@
 }
 .container {
     background-image: url('/images/background.jpg');
-    background-size: 93% cover;
+    background-size: 120% auto;
     background-position: center;
     display: flex;
     padding: 20px;
@@ -16,7 +24,7 @@
     min-height: 100vh;
   
   }
-  
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -154,7 +162,7 @@
   .uploadFileButton {
     position: relative;
     width: 100%;
-    height: 40px; /* Altura del botón */
+    height: 40px;
   }
   
   .uploadFileButton input[type="file"] {
@@ -163,13 +171,13 @@
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0; /* Oculta el input file, pero permite interacción */
+    opacity: 0; 
     cursor: pointer;
   }
   
   .uploadFileButton label {
     display: inline-block;
-    background-color: #A275BD; /* El mismo color de fondo que los otros botones */
+    background-color: #A275BD; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -178,18 +186,85 @@
     width: 100%;
     text-align: center;
     cursor: pointer;
-    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+    box-sizing: border-box;
   }
   
   .uploadFileButton label:hover {
-    background-color: #8c57a0; /* Color más oscuro al pasar el mouse */
+    background-color: #8c57a0; 
   }
   
   .uploadFileButton label:active {
-    background-color: #764b94; /* Color más oscuro cuando se presiona */
+    background-color: #764b94; 
   }
   
   .uploadFileButton label:focus {
     outline: none;
+  }
+  .pin {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+    min-width: 280px;
+    max-width: 320px;
+    padding: 15px; 
+  }
+  
+  .pinTitle,
+  .pinDescription,
+  .pinUser,
+  .pinLikes {
+    padding: 10px; 
+    margin: 5px 0; 
+    text-align: center; 
+  }
+  
+  .textarea {
+    width: 100%; 
+    max-width: 100%; 
+    height: 100px; 
+    margin-top: 10px;
+    padding: 10px; 
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Sour Gummy', sans-serif; 
+    font-size: 1rem; 
+    box-sizing: border-box;
+    resize: none; 
+  }
+  
+  
+  .selectCategory {
+    background-color: #A275BD;
+    color: white;
+    border: none;
+    padding: 10px 15px; /* Espacio interno mayor */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .actions {
+    width: 250px;
+    background-color: #ffffff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    font-family: 'Sour Gummy', sans-serif; /* Se aplica la fuente */
+  }
+  .actions button,
+  .actions input,
+  .actions select,
+  .actions label {
+    font-family: 'Sour Gummy', sans-serif; /* Asegura que todos los elementos usen la misma fuente */
   }
   

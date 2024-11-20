@@ -11,8 +11,6 @@ export default function Home() {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(""); 
   const [description, setDescription] = useState('');
-  const [password, setPassword] = useState('');  
-  const [pinToDelete, setPinToDelete] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -106,30 +104,6 @@ export default function Home() {
 
 
 
-  const handleDeletePin = async () => {
-    if (password === correctPassword) {
-      try {
-        const res = await fetch(`http://localhost:4000/pins/${pinToDelete.id}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password }), // Enviar la contraseña en el cuerpo de la solicitud
-        });
-  
-        if (!res.ok) throw new Error('Error al eliminar el pin');
-        setPins(pins.filter(pin => pin.id !== pinToDelete.id));
-        setPinToDelete(null);
-        setPassword(''); // Limpiar la contraseña después de eliminar
-        alert('Pin eliminado correctamente');
-      } catch (error) {
-        console.error('Error al eliminar el pin:', error);
-        alert('No se pudo eliminar el pin.');
-      }
-    } else {
-      alert('Contraseña incorrecta.');
-    }
-  };
-
-
 
 
   return (
@@ -179,7 +153,8 @@ export default function Home() {
           <option value="Diseño">Diseño</option>
           <option value="Paisaje">Paisaje</option>
           <option value="Animales">Animales</option>
-          <option value="Memes">memes</option>
+          <option value="Memes">Memes</option>
+          <option value="Musica">Musica</option>
           <option value="Otro">Otro</option>
         </select>
   
@@ -203,23 +178,9 @@ export default function Home() {
             <p className={styles.pinUser}>Subido por: {pin.username}</p>
             <p className={styles.pinDescription}>{pin.description}</p> 
             <p className={styles.pinLikes}>{pin.like_count} Likes❤️</p> 
-              {/* Botón para eliminar el pin */}
-              <button
-                className={styles.button}
-                onClick={() => {
-                  setPinToDelete(pin); // Establecer el pin que se va a eliminar
-                  alert('Se te pedirá la contraseña para confirmar la eliminación');
-                }}
-              >
-                Eliminar Pin
-              </button>
           </div>
         ))}
-        <div className={styles.confirmDeleteContainer}>
-          <button className={styles.button} onClick={handleDeletePin}>
-            Confirmar Eliminación
-          </button>
-        </div>
+        
       </div>
     </div>
   );
