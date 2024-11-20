@@ -1,4 +1,4 @@
-
+import styles from "./styles/Home.module.css";
 
 export const metadata = {
   title: 'Next.js',
@@ -8,7 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={styles.body}>{children}</body>
     </html>
   )
 }

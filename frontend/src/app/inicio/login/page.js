@@ -36,7 +36,7 @@ export default function Login() {
       {}
       <body className={styles.body}>
         <div className={styles.container}>
-          <h2 className={styles.title}>Te damos la bienvenida a ICONIC</h2>
+          <h2 className={styles.title}>ICONIC</h2>
           <input className={styles.input} name="email" type="email" placeholder="Email" onChange={handleChange} required />
           <input className={styles.input} name="password" type="password" placeholder="Contraseña" onChange={handleChange} required />
           <button className={styles.button} onClick={handleSubmit} type="button">Iniciar sesión</button>

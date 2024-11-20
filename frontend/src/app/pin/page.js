@@ -143,7 +143,7 @@ export default function Pin() {
   if (!pin) return <div>Cargando...</div>;
 
   return (
-    <div className={styles.div}>
+    <div className={styles.div1}>
       <a href="../home">
         <img className={styles["icono-volver"]} src="flecha_izquierda.png" alt="Volver atras" />
       </a>
@@ -162,13 +162,12 @@ export default function Pin() {
 
 
         {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
-{/* Insertamos el bloque HTML que mencionaste */}
         <div className={styles.chatContainer}>
           <h3>Comentarios</h3>
           <div className={styles.comments}>
             {comments.map((comment, index) => (
               <div key={index} className={styles.comment}>
-                <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
+                <strong>{comment.user_id === userID ? "Yo" : comment.username}:</strong> {comment.comment_text}
               </div>
             ))}
           </div>

@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 .container {
-  font-family: 'Sour Gummy', sans-serif;
+  font-family: 'Playfair Display', serif; 
 }
+
 
 
 
@@ -228,7 +229,7 @@
     padding: 10px; 
     border-radius: 5px;
     border: 1px solid #ccc;
-    font-family: 'Sour Gummy', sans-serif; 
+    font-family: 'Playfair Display', serif; 
     font-size: 1rem; 
     box-sizing: border-box;
     resize: none; 
@@ -259,12 +260,12 @@
     position: sticky;
     top: 0;
     height: 100vh;
-    font-family: 'Sour Gummy', sans-serif; /* Se aplica la fuente */
+    font-family: 'Playfair Display', serif; /* Se aplica la fuente */
   }
   .actions button,
   .actions input,
   .actions select,
   .actions label {
-    font-family: 'Sour Gummy', sans-serif; /* Asegura que todos los elementos usen la misma fuente */
+    font-family: 'Playfair Display', serif; /* Asegura que todos los elementos usen la misma fuente */
   }
   
