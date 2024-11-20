@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import styles from "../styles/Tableros.module.css";
 
+
 const Atras = () => {
   router.push('../home');
 };
@@ -40,7 +41,7 @@ function Boards() {
   }
 
   return (
-    <div className={styles.boardsContainer}>
+    <div className={styles.div}>
       <a href="../home">
       <img className={styles["icono-volver"]} src="flecha_izquierda.png" alt="Volver atras" />
       </a>

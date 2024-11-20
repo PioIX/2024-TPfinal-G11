@@ -12,12 +12,12 @@ export default function Pin() {
   const id = searchParams.get('ID');
   const [userID, setUserID] = useState(null);
   const [likes, setLikes] = useState(0);
-  const [hasLiked, setHasLiked] = useState(false); 
+  const [hasLiked, setHasLiked] = useState(false);
   const [pin, setPin] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const {socket,isConnected} = useSocket();
+  const { socket, isConnected } = useSocket();
 
   useEffect(() => {
     const storedUserID = localStorage.getItem('userID');
@@ -28,15 +28,15 @@ export default function Pin() {
     }
   }, [id, userID]);
 
-  
+
   useEffect(() => {
     if (!socket) return;
-  
+
     socket.on("new-comment", (data) => {
       setComments((prevComments) => [...prevComments, data]);
       console.log("Todos mis comentarios son:", [...comments, data]);
     });
-  
+
     // Limpieza para evitar duplicados de eventos
     return () => {
       socket.off("new-comment");
@@ -59,22 +59,22 @@ export default function Pin() {
       if (!res.ok) throw new Error('Error al cargar el pin');
       const data = await res.json();
       setPin(data);
-      setLikes(data.likes); 
-  
+      setLikes(data.likes);
+
       if (userID) {
         const likeRes = await fetch(`http://localhost:4000/likes?pin_id=${pinId}&user_id=${userID}`);
         if (!likeRes.ok) throw new Error('Error al verificar el estado del like');
         const likeData = await likeRes.json();
-        setHasLiked(!!likeData.exists); 
+        setHasLiked(!!likeData.exists);
       }
     } catch (error) {
       console.error('Error al cargar el pin:', error);
     }
   };
-  
-  
 
- 
+
+
+
 
   const handleLike = async () => {
     try {
@@ -85,16 +85,16 @@ export default function Pin() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pin_id: id, user_id: userID })
         });
-  
-        if (!res.ok) throw new Error(await res.text()); 
-  
+
+        if (!res.ok) throw new Error(await res.text());
+
         const data = await res.json();
-  
-        
+
+
         if (data.message === "Like eliminado") {
-          setLikes((prevLikes) => prevLikes - 1); 
-          setHasLiked(false); 
-          setErrorMessage(""); 
+          setLikes((prevLikes) => prevLikes - 1);
+          setHasLiked(false);
+          setErrorMessage("");
         } else {
           setErrorMessage("Hubo un problema al eliminar el like.");
         }
@@ -104,16 +104,16 @@ export default function Pin() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pin_id: id, user_id: userID })
         });
-  
-        if (!res.ok) throw new Error(await res.text()); 
-  
+
+        if (!res.ok) throw new Error(await res.text());
+
         const data = await res.json();
-  
-      
+
+
         if (data.message === "Like agregado") {
-          setLikes((prevLikes) => prevLikes + 1); 
-          setHasLiked(true); 
-          setErrorMessage(""); 
+          setLikes((prevLikes) => prevLikes + 1);
+          setHasLiked(true);
+          setErrorMessage("");
           console.log("se agrego")
         } else {
           ;
@@ -124,54 +124,53 @@ export default function Pin() {
       setErrorMessage("Hubo un problema al manejar el like.");
     }
   };
-  
+
 
   if (!pin) return <div>Cargando...</div>;
 
   return (
-    <div>
-    {/* Colocamos el enlace fuera del contenedor principal */}
-    <a href="../home">
-      <img className={styles["icono-volver"]} src="flecha_izquierda.png" alt="Volver atras" />
-    </a>
-    <div className={styles.pinContainer}>
-      <img src={pin.image_url} alt={pin.title} className={styles.image} />
-      <h1 className={styles.pinTitle}>{pin.title}</h1>
-      <p className={styles.pinUser}>Subido por: {pin.username}</p>
-      <h2 className={styles.pinDescription}>{pin.description}</h2>
+    <div className={styles.div}>
+      <a href="../home">
+        <img className={styles["icono-volver"]} src="flecha_izquierda.png" alt="Volver atras" />
+      </a>
+      <div className={styles.pinContainer}>
+        <img src={pin.image_url} alt={pin.title} className={styles.image} />
+        <h1 className={styles.pinTitle}>{pin.title}</h1>
+        <p className={styles.pinUser}>Subido por: {pin.username}</p>
+        <h2 className={styles.pinDescription}>{pin.description}</h2>
 
-      <button
-        onClick={handleLike}
-        className={`${styles.button} ${hasLiked ? styles.liked : ''}`} 
-      >
-        {hasLiked ? "Like ❤️" : "Like"} 
-      </button>
+        <button
+          onClick={handleLike}
+          className={`${styles.button} ${hasLiked ? styles.liked : ''}`}
+        >
+          {hasLiked ? "Like ❤️" : "Like"}
+        </button>
 
-    
-      {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
 
-      <div className={styles.chatContainer}>
-        <h3>Comentarios</h3>
-        <div className={styles.comments}>
-          {comments.map((comment, index) => (
-            <div key={index} className={styles.comment}>
-              <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
-            </div>
-          ))}
-        </div>
+        {errorMessage && <p className={`${styles.errorMessage} ${errorMessage ? styles.error : ''}`}>{errorMessage}</p>}
+{/* Insertamos el bloque HTML que mencionaste */}
+        <div className={styles.chatContainer}>
+          <h3>Comentarios</h3>
+          <div className={styles.comments}>
+            {comments.map((comment, index) => (
+              <div key={index} className={styles.comment}>
+                <strong>{comment.user_id === userID ? "Yo" : comment.user_id}:</strong> {comment.comment_text}
+              </div>
+            ))}
+          </div>
 
-        <div className={styles.commentInput}>
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Escribe un comentario..."
-            className={styles.commentInputField}
-          />
-          <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
+          <div className={styles.commentInput}>
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Escribe un comentario..."
+              className={styles.commentInputField}
+            />
+            <button onClick={handleCommentSubmit} className={styles.sendButton}>Enviar</button>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

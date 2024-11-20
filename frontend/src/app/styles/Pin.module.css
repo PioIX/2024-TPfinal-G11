@@ -5,7 +5,10 @@
   margin: auto;
 }
 
-
+.div {
+  background-image: url('/images/background.jpg');
+  background-size: 100% auto;
+}
 .pinContainer {
   display: flex;
   flex-direction: column;
@@ -18,8 +21,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
 }
-
-
 
 
 .image {
@@ -87,6 +88,8 @@
 .commentInput {
   display: flex;
   flex-direction: column;
+  position: relative;
+  white-space: pre-wrap;
 }
 
 .textarea {
